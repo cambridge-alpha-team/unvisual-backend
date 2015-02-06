@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry excluding="node-cubelets/web/js/|node-cubelets/response/|node-cubelets/examples/|node-cubelets/service/|node-cubelets/|node-cubelets/scanner/|node-cubelets/command/|node-cubelets/test/|node-cubelets/connection/" kind="src" path="node-server"/>
+	<classpathentry excluding="web/js/|response/|examples/|service/|scanner/|command/|test/|connection/" kind="src" path="node-server/node-cubelets"/>
+	<classpathentry kind="src" path="node-server/node-cubelets/command"/>
+	<classpathentry kind="src" path="node-server/node-cubelets/connection"/>
+	<classpathentry kind="src" path="node-server/node-cubelets/examples"/>
+	<classpathentry kind="src" path="node-server/node-cubelets/response"/>
+	<classpathentry kind="src" path="node-server/node-cubelets/scanner"/>
+	<classpathentry kind="src" path="node-server/node-cubelets/service"/>
+	<classpathentry kind="src" path="node-server/node-cubelets/test"/>
+	<classpathentry kind="src" path="node-server/node-cubelets/web/js"/>
+	<classpathentry kind="con" path="org.eclipse.wst.jsdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="output" path=""/>
+</classpath>
