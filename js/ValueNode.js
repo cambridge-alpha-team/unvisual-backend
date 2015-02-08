@@ -1,5 +1,5 @@
-function ValueNode(name, parent, defaultValue, min, max) {
-	var valueNode = new Node(name, parent);
+function ValueNode(name, parent, childNumber, defaultValue, min, max) {
+	var valueNode = new Node(name, parent, childNumber);
 	valueNode.defaultValue = defaultValue;
 	valueNode.cubelet = 0;
 	valueNode.Min = min;

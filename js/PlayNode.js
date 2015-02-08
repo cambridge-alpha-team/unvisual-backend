@@ -1,5 +1,5 @@
-function PlayNode(parent) {
-	var playNode = new ActionNode('play', parent, [/* a list of ValueNodes */]);
+function PlayNode(parent, childNumber) {
+	var playNode = new ActionNode('play', parent, childNumber, [/* a list of ValueNodes */]);
 	
 	return playNode;
 }

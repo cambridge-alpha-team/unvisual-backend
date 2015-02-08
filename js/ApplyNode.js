@@ -1,5 +1,5 @@
-function ApplyNode(name, parent, children) {
-	var applyNode = new Node(name, parent, children);
+function ApplyNode(name, parent, children, childNumber) {
+	var applyNode = new Node(name, parent, children, childNumber);
 	
 	return applyNode;
 }

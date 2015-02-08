@@ -1,5 +1,5 @@
-function FXNode(name, parent, children) {
-	var fxNode = new ApplyNode(name, parent, children);
+function FXNode(name, parent, childNumber, children) {
+	var fxNode = new ApplyNode(name, parent, childNumber, children);
 	
 	return fxNode;
 }

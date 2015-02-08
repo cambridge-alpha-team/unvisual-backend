@@ -1,5 +1,5 @@
 function RootNode() {
-	var rootNode = new Node("Root");
+	var rootNode = new Node("root");
 	
 	return rootNode;
 }

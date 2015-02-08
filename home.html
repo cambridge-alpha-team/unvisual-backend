@@ -1,0 +1,79 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta charset=utf8>
+	<meta name=viewport content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+        <title id='title'>HTML Page setup Tutorial</title>
+ 
+        <!-- ** CSS ** -->
+        <!-- base library -->
+ 
+        <!-- overrides to base library -->
+ 
+ 
+        <!-- ** Javascript ** -->
+        <!-- ExtJS library: base/adapter -->
+ 
+        <!-- ExtJS library: all widgets -->
+        <script src="mousetrap.min.js"></script>
+ 
+        <!-- overrides to base library -->
+ 
+        <!-- extensions -->
+ 
+        <!-- page specific -->
+        <script src="js/ActionNode.js"></script>
+        <script src="js/ApplyNode.js"></script>
+        <script src="js/ChoiceNode.js"></script>
+        <script src="js/FXNode.js"></script>
+        <script src="js/LoopNode.js"></script>
+        <script src="js/Node.js"></script>
+        <script src="js/PlayNode.js"></script>
+        <script src="js/RootNode.js"></script>
+        <script src="js/SampleNode.js"></script>
+        <script src="js/SleepNode.js"></script>
+        <script src="js/SynthNode.js"></script>
+        <script src="js/TempoNode.js"></script>
+        <script src="js/ValueNode.js"></script>
+        
+    </head>
+    <body>
+
+	<script>
+	    // single keys
+	    Mousetrap.bind('4', function() { console.log('4'); });
+	    Mousetrap.bind("?", function() { console.log('show shortcuts!'); });
+	    Mousetrap.bind('esc', function() { console.log('escape'); }, 'keyup');
+
+	    // combinations
+	    Mousetrap.bind('command+shift+k', function() { console.log('command shift k'); });
+
+	    // map multiple combinations to the same callback
+	    Mousetrap.bind(['command+k', 'ctrl+k'], function() {
+		console.log('command k or control k');
+
+		// return false to prevent default browser behavior
+		// and stop event from bubbling
+		return false;
+	    });
+
+	    // gmail style sequences
+	    Mousetrap.bind('g i', function() { console.log('go to inbox'); });
+	    Mousetrap.bind('* a', function() { console.log('select all'); });
+
+	    // konami code!
+	    Mousetrap.bind('up up down down left right left right b a enter', function() {
+		console.log('konami code');
+	    });
+	</script>
+
+	<div id="speech" aria-live=assertive></div>
+
+	<div id="wrap">
+	  <ul id=root-outer>
+	  </ul>
+	</div>
+
+	<script src="js/main.js"></script>
+    </body>
+</html>
