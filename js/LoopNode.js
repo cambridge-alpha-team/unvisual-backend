@@ -1,5 +1,5 @@
-function LoopNode(name) {
-	var loopNode = new Node(name, root);
+function LoopNode(name, parent, childNumber) {
+	var loopNode = new Node(name, parent, childNumber);
 	
 	return loopNode;
 }
