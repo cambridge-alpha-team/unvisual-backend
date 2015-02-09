@@ -4,6 +4,8 @@ var addCode = false;
 var codeTypes = ["loop", "play", "sleep", "fx", "synth", "sample"];
 var selectedCodeType;
 var loopNumber = 1; //to uniquely name loops
+var sonicPi = "";
+
 
 //tests--------------
 var loopA = LoopNode("loop" + loopNumber++, root, 1);
@@ -144,7 +146,34 @@ Mousetrap.bind(['up'], function() {
 	}
 });
 
+if (!String.prototype.startsWith) {
+	  Object.defineProperty(String.prototype, 'startsWith', {
+	    enumerable: false,
+	    configurable: false,
+	    writable: false,
+	    value: function(searchString, position) {
+	      position = position || 0;
+	      return this.lastIndexOf(searchString, position) === position;
+	    }
+	  });
+	}
+
 //takes the root and generates code
-function generateCode() {
-	
+function generateCode(node) {
+	for (child in node.children) {
+		if ((child.name).startsWith("loop")) {
+			sonicPi = "live_loop :" + child.name + " do \n";
+			(node.children).forEach(generateCode);
+			sonicPi += "\n end"
+		} else if ((child.name).startsWith("play")) {
+			
+		} else if ((child.name).startsWith("synth")) {
+			
+		} else if ((child.name).startsWith("sample")) {
+			
+		} else if ((child.name).startsWith("fx")) {
+			
+		}
+		
+	}
 }
