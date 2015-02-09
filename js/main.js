@@ -79,9 +79,34 @@ Mousetrap.bind(['left'], function() {
 //shortcut to go into a list
 Mousetrap.bind(['right'], function() {
 	if(addCode) {
-		if(selectedCodeType == 0) {
-			activeNode = new LoopNode("loop" + loopNumber++, activeNode.parent, (activeNode.parent.children.indexOf(activeNode) + 1));
-			console.log("new loop created");
+		switch(selectedCodeType) {
+			case 0:	// loop
+				activeNode = new LoopNode("loop" + loopNumber++, activeNode.parent, (activeNode.parent.children.indexOf(activeNode) + 1));
+				console.log("new loop created");
+				break;
+			case 1:	// play
+				activeNode = new PlayNode(activeNode.parent, (activeNode.parent.children.indexOf(activeNode) + 1));
+				console.log("new note created");
+				break;
+			case 2:	// sleep
+				activeNode = new SleepNode(activeNode.parent, (activeNode.parent.children.indexOf(activeNode) + 1));
+				console.log("new rest created");
+				break;
+			case 3:	// fx
+				activeNode = new FXNode(activeNode.parent);
+				console.log("new FX created");
+				break;
+			case 4:	// synth
+				activeNode = new SynthNode(activeNode.parent, (activeNode.parent.children.indexOf(activeNode) + 1));
+				console.log("new synth created");
+				break;
+			case 5:	// sample
+				activeNode = new SampleNode(activeNode.parent, (activeNode.parent.children.indexOf(activeNode) + 1));
+				console.log("new sample created");
+				break;
+			default:	// something's wrong
+				console.log("ERROR on addCode.");
+				break;
 		}
 		console.log(activeNode.name);
 		addCode = false;
