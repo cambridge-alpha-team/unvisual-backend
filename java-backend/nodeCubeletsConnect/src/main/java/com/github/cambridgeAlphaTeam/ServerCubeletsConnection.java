@@ -27,7 +27,7 @@ public class ServerCubeletsConnection extends Thread implements
   private ServerSocket listenSocket;
   private static final Logger logger = Logger.getLogger(
                                          ServerCubeletsConnection.class);
-  static ObjectMapper mapper = new ObjectMapper();
+  private static ObjectMapper mapper = new ObjectMapper();
 
   public ServerCubeletsConnection(int port) throws IOException
   { /* One for each face of the Bluetooth cube */
@@ -35,6 +35,7 @@ public class ServerCubeletsConnection extends Thread implements
 
     /* We want failed listenin socket creations to throw an exception */
     listenSocket =  new ServerSocket(port);
+    setDaemon(true);
     start();
   }
 

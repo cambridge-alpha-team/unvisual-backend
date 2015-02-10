@@ -8,8 +8,9 @@ public class Main
 { public static void main (String[] args) throws NumberFormatException,
     IOException
   { if (args.length > 0)
-    { CubeletsConnection conn = new ServerCubeletsConnection(
-        Integer.parseInt(args[0]));
+    { //CubeletsConnection conn = new ServerCubeletsConnection(
+      //  Integer.parseInt(args[0]));
+      CubeletsConnection conn = new ExecCubeletsConnection(args);
 
       while (true)
       { System.out.println("|---------------|");
