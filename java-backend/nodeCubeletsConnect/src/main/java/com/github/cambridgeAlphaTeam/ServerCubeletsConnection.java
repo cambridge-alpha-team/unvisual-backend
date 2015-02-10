@@ -21,8 +21,8 @@ import org.apache.log4j.Logger;
  * @author Kovacsics Robert &lt;rmk35@cam.ac.uk&gt;
  */
 
-public class ServerCubeletsConnection implements CubeletsConnection,
-  Runnable
+public class ServerCubeletsConnection extends Thread implements
+  CubeletsConnection
 { private int[] cubeletValues;
   private ServerSocket listenSocket;
   private static final Logger logger = Logger.getLogger(
@@ -35,6 +35,7 @@ public class ServerCubeletsConnection implements CubeletsConnection,
 
     /* We want failed listenin socket creations to throw an exception */
     listenSocket =  new ServerSocket(port);
+    start();
   }
 
   @Override
@@ -48,6 +49,8 @@ public class ServerCubeletsConnection implements CubeletsConnection,
       { logger.error(e);
         return;
       }
+
+      logger.debug("Got a new incoming connection");
 
       /* socketHandlingThread to handle the connection {{{ */
       Thread socketHandlingThread = new Thread()

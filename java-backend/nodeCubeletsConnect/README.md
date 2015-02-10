@@ -1,5 +1,5 @@
 To compile and test (uses netcat for connecting to the socket):
-```
+```sh
 cat <<EOF > target/run-test.sh
 #!/bin/sh
 VAL=0
@@ -7,7 +7,8 @@ while true; do
   cat <<EOF | nc localhost 8080
 { "95934": null, "96031": ${VAL},  "96147": 0, "96302": null }
 EOF
-sleep 1s
+  VAL=$(((${VAL}+1)%256))
+  sleep 1s
 done
 EOF
 chmod +x target/run-tests.sh
