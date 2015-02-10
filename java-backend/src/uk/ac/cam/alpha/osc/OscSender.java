@@ -13,34 +13,51 @@ import com.illposed.osc.OSCPortOut;
  */
 public class OscSender {
     
-    private static InetAddress localhost;
-    private static final int port = 12345;
+    private static final int port = 4557;
     private OSCPortOut sender;
+    private static final String EXAMPLE_CODE =
+            "loop do sample :perc_bell, rate: (rrand 0.125, 1.5)\n sleep rrand(0.1, 2)\n end ";
     
-    public OscSender() throws SocketException, UnknownHostException {
-        localhost = InetAddress.getLocalHost();
-        sender = new OSCPortOut(localhost, port);
+    public OscSender() throws OscException {
+        try {
+            /* Warning for future to avoid repeat of pain:
+             * do not use InetAddress.getlocalHost() */
+            InetAddress localhost = InetAddress.getByName("127.0.0.1");
+            sender = new OSCPortOut(localhost, port);
+        } catch (SocketException e) {
+            throw new OscException(e);
+        } catch (UnknownHostException e) {
+            throw new OscException(e);
+        }
     }
     
     public void close() {
         sender.close();
     }
     
-    public void send(OSCMessage message) throws IOException {
-        sender.send(message);
+    public void send(OSCMessage message) throws OscException {
+        try {
+            sender.send(message);
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new OscException(e);
+        }
     }
     
-    public void sendCode(String code) throws IOException {
+    public void sendCode(String code) throws OscException {
         OSCMessage toSend = new OSCMessage("/run-code");
         toSend.addArgument(code);
         send(toSend);
     }
     
-    public static void main(String[] args) throws IOException {
+    public void stopAll() throws OscException {
+        send(new OSCMessage("/stop-all-jobs"));
+    }
+    
+    public static void main(String[] args) throws OscException {
         OscSender oscs = new OscSender();
-        oscs.sendCode("This is a test");
+        oscs.sendCode(EXAMPLE_CODE);
         oscs.close();
-        System.out.println("OSC message sent");
     }
 
 }
