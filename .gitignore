@@ -1,3 +1,8 @@
+# Backup and swap files
+*~
+.*.swp
+*.orig
+
 # node.js stuff
 
 # Logs
@@ -45,3 +50,5 @@ node_modules
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 
+# Maven build directory
+target/
