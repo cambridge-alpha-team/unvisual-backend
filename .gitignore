@@ -3,6 +3,17 @@
 .*.swp
 *.orig
 
+# eclipse files
+.project
+.settings
+.metadata
+.classpath
+*.jar
+*.war
+*.ear
+bin/**
+tmp/**
+
 # node.js stuff
 
 # Logs
