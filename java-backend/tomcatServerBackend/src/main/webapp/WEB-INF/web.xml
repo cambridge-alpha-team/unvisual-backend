@@ -19,6 +19,10 @@
 
   <servlet-mapping>
     <servlet-name>resteasy-servlet</servlet-name>
-    <url-pattern>/*</url-pattern>
+    <url-pattern>/api/*</url-pattern>
   </servlet-mapping>
+
+  <welcome-file-list>
+    <welcome-file>frontend/index.html</welcome-file>
+  </welcome-file-list>
 </web-app>
