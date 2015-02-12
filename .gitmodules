@@ -1,3 +1,6 @@
 [submodule "node-server/node-cubelets"]
 	path = node-server/node-cubelets
 	url = git@github.com:cambridge-alpha-team/node-cubelets.git
+[submodule "java-backend/tomcatServerBackend/src/main/webapp"]
+	path = java-backend/tomcatServerBackend/src/main/webapp
+	url = git@github.com:cambridge-alpha-team/unvisual-frontend.git
