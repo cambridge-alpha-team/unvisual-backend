@@ -9,7 +9,11 @@ import java.net.BindException;
 import com.sun.net.httpserver.*;
 
 /**
- * Demo for FileHandler.java, serves all files in /static in the .ajr
+ * Demo for FileHandler.java, serves all files either in the current
+ * directory (if no arguments are given) or in the directory given by
+ * the first argument.
+ * The second argument optionally represents a file to send when we
+ * get a file not found.
  * @author Kovacsics Robert &lt;rmk35@cam.ac.uk&gt;
  */
 public class FileServerDemo {
