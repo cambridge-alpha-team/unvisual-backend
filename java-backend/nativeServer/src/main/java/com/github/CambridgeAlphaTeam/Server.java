@@ -20,10 +20,15 @@ public class Server {
     private static OscSender sender;
 
     public static void main(String[] args) throws IOException {
+        if (args.length != 1) {
+            System.err.println("Give precisely one argument, the location of the front end files to serve");
+            return;
+        }
         HttpServer server = HttpServer.create(new InetSocketAddress(8000), 0);
         server.createContext("/hiworld", new LoggerHandler(new ExampleHandler()));
         server.createContext("/run", new LoggerHandler(new RunCodeHandler()));
         server.createContext("/stop", new LoggerHandler(new StopMusicHandler()));
+        server.createContext("/", new LoggerHandler(new FileHandler(args[0]))); // serves front end
         server.setExecutor(null); // creates a default executor
         server.start();
         System.out.println("Server started");
