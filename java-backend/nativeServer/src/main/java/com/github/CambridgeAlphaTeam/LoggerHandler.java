@@ -42,7 +42,7 @@ class LoggerHandler implements HttpHandler {
         t.sendResponseHeaders(500, errorReturn.length);
         OutputStream os = t.getResponseBody();
         os.write(errorReturn);
-        os.close();
+        t.close();
       } catch (IOException e1) {
         logger.error("Failed to notify client about the error!", e1);
       }
