@@ -2,16 +2,14 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.github.cambridgeAlphaTeam</groupId>
-  <artifactId>nodeCubeletsConnect</artifactId>
+  <artifactId>nativeServer</artifactId>
   <packaging>jar</packaging>
   <version>1.0-SNAPSHOT</version>
-  <name>nodeCubeletsConnect</name>
+  <name>nativeServer</name>
   <url>http://maven.apache.org</url>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <!-- Use the latest version whenever possible. -->
-    <jackson.version>2.5.1</jackson.version>
   </properties>
 
   <build>
@@ -32,26 +30,19 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.12</version>
+      <version>3.8.1</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-databind</artifactId>
-      <version>${jackson.version}</version>
+      <groupId>com.github.cambridgeAlphaTeam</groupId>
+      <artifactId>oscSender</artifactId>
+      <version>1.0-SNAPSHOT</version>
     </dependency>
     <dependency>
-      <!-- Note: core-annotations version x.y.0 is generally compatible with
-         (identical to) version x.y.1, x.y.2, etc. -->
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-annotations</artifactId>
-      <version>${jackson.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-core</artifactId>
-      <version>${jackson.version}</version>
+      <groupId>com.github.cambridgeAlphaTeam</groupId>
+      <artifactId>nodeCubeletsConnect</artifactId>
+      <version>1.0-SNAPSHOT</version>
     </dependency>
 
     <dependency>

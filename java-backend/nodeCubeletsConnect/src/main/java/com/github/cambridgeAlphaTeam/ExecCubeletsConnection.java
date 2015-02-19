@@ -12,7 +12,8 @@ import java.util.TreeSet;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
@@ -24,16 +25,16 @@ import java.util.Map;
  */
 
 class ExecCubeletsConnection extends Thread implements
-  CubeletsConnection
-{ private int[] cubeletValues;
+  CubeletsConnection {
+  private int[] cubeletValues;
   private static ObjectMapper mapper = new ObjectMapper();
-  private static final Logger logger = Logger.getLogger(
-                                         ServerCubeletsConnection.class);
   Process cubeletsProcess;
+  private static final Logger logger =
+    LoggerFactory.getLogger(ServerCubeletsConnection.class);
 
   public ExecCubeletsConnection(final String[] cmdarray) throws
-    IOException
-  { /* One for each face of the Bluetooth cube */
+    IOException {
+    /* One for each face of the Bluetooth cube */
     cubeletValues = new int[6];
 
     cubeletsProcess = Runtime.getRuntime().exec(cmdarray);
@@ -42,53 +43,50 @@ class ExecCubeletsConnection extends Thread implements
   }
 
   @Override
-  public void run()
-  { BufferedReader reader = new BufferedReader(new InputStreamReader(
+  public void run() {
+    BufferedReader reader = new BufferedReader(new InputStreamReader(
           cubeletsProcess.getInputStream()));
-    while (true)
-    { String line;
-      try
-      { line = reader.readLine();
-      }
-      catch (IOException e)
-      { logger.error(e);
+    while (true) {
+      String line;
+      try {
+        line = reader.readLine();
+      } catch (IOException e) {
+        logger.error("Failed to read a line from cubelets child process", e);
         return;
       }
 
-      if (line != null)
-      { logger.debug("Got a line: ");
+      if (line != null) {
+        logger.debug("Got a line: ");
         logger.debug(line);
-        try
-        { Map<Integer, Integer> readValue = mapper.readValue(line,
+        try {
+          Map<Integer, Integer> readValue = mapper.readValue(line,
           new TypeReference<Map<Integer, Integer>>() { });
           setCubeletValues(readValue);
-        }
-        catch (IOException e)
-        { logger.error(e);
+        } catch (IOException e) {
+          logger.error("Failed to convert line read to JSON", e);
         }
       }
     }
   }
 
-  public synchronized int[] getCubeletValues()
-  { return cubeletValues;
+  public synchronized int[] getCubeletValues() {
+    return cubeletValues;
   }
 
   public synchronized void setCubeletValues(Map<Integer, Integer>
-      cubeletsMap)
-  { logger.debug("" + cubeletValues + "\t" + cubeletsMap);
+      cubeletsMap) {
+    logger.debug("" + cubeletValues + "\t" + cubeletsMap);
     SortedSet<Integer> keys = new TreeSet<Integer>(cubeletsMap.keySet());
     int i = 0;
-    for (Integer key : keys)
-    { if (i < 6)
-      { Integer value = cubeletsMap.get(key);
-        if (value != null)
-        { cubeletValues[i] = value;
+    for (Integer key : keys) {
+      if (i < 6) {
+        Integer value = cubeletsMap.get(key);
+        if (value != null) {
+          cubeletValues[i] = value;
         }
         i++;
-      }
-      else
-      { break;
+      } else {
+        break;
       }
     }
   }
