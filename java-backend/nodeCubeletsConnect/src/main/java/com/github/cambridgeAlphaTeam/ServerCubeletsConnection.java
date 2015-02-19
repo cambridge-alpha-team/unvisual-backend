@@ -25,10 +25,12 @@ import org.slf4j.LoggerFactory;
 public class ServerCubeletsConnection extends Thread implements
   CubeletsConnection {
   private int[] cubeletValues;
+
   private ServerSocket listenSocket;
+  private static ObjectMapper mapper = new ObjectMapper();
+
   private static final Logger logger =
     LoggerFactory.getLogger(ServerCubeletsConnection.class);
-  private static ObjectMapper mapper = new ObjectMapper();
 
   public ServerCubeletsConnection(int port) throws IOException {
     /* One for each face of the Bluetooth cube */

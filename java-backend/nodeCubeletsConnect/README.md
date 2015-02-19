@@ -4,11 +4,15 @@ cat <<EOF > target/run-test.sh
 #!/bin/sh
 VAL=0
 while true; do
-  cat <<EOF
+  cat <<EOF # | nc localhost 8080
 { "95934": null, "96031": ${VAL},  "96147": 0, "96302": null }
 EOF
   VAL=$(((${VAL}+1)%256))
   sleep 1s
+  # To test watchdog
+  if [ "$VAL" -eq 5 ]; then
+    sleep 5s;
+  fi
 done
 EOF
 chmod +x target/run-tests.sh
