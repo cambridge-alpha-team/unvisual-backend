@@ -21,9 +21,9 @@ public class Server {
 
     public static void main(String[] args) throws IOException {
         HttpServer server = HttpServer.create(new InetSocketAddress(8000), 0);
-        server.createContext("/hiworld", new ExampleHandler());
-        server.createContext("/run", new RunCodeHandler());
-        server.createContext("/stop", new StopMusicHandler());
+        server.createContext("/hiworld", new LoggerHandler(new ExampleHandler()));
+        server.createContext("/run", new LoggerHandler(new RunCodeHandler()));
+        server.createContext("/stop", new LoggerHandler(new StopMusicHandler()));
         server.setExecutor(null); // creates a default executor
         server.start();
         System.out.println("Server started");
