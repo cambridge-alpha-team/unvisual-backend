@@ -17,7 +17,7 @@ public class WatchDogMonitorTest {
     LoggerFactory.getLogger(ServerCubeletsConnection.class);
 
   @Test
-  public void testKillingThread() {
+  public void testRestartingThread() {
     KillTest test  = new KillTest();
     WatchDog watch = new WatchDogMonitor();
     watch.setTask(test, 100);
@@ -31,7 +31,7 @@ public class WatchDogMonitorTest {
 
     watchThread.start();
 
-    for (int i = 0; i < 5 && taskThread.isAlive(); i++) {
+    for (int i = 0; i < 5 && test.getKilled(); i++) {
       try {
         Thread.sleep(100);
       } catch(InterruptedException e) {
@@ -39,7 +39,7 @@ public class WatchDogMonitorTest {
       }
     }
 
-    Assert.assertFalse(taskThread.isAlive());
+    Assert.assertFalse(test.getKilled());
     watch.shutDown();
   }
 
@@ -63,8 +63,17 @@ public class WatchDogMonitorTest {
 
     public void run() {
       synchronized (this) {
-        started = true;
-        killed = false;
+        /* If not started already */
+        if (!started)
+        {
+          started = true;
+          killed = false;
+        }
+        else
+        {
+          /* If this is a restart, just do nothing */
+          return;
+        }
       }
 
       boolean localKilled = false;
