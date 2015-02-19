@@ -20,7 +20,7 @@ import com.sun.net.httpserver.*;
 class FileHandler implements HttpHandler {
   /* Where to serve files from */
   private final String servePath;
-  /* The path for 414.html */
+  /* The path for 404.html */
   private final File notFoundFile;
   /* Buffer size when reading in files */
   private static final int bufferSize = 10*1024;
