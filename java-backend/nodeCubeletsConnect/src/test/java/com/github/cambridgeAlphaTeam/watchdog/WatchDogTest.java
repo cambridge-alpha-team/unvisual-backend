@@ -17,17 +17,15 @@ public class WatchDogTest {
     LoggerFactory.getLogger(WatchDogTest.class);
 
   @Test
-  public void testRestart() {
-    /* See below for WatchableTest definition */
+  public void testTimeoutRestart() {
+    /* See below for WatchableTest definition. */
     IWatchDog<WatchableTest> watchDog =
-      new WatchDog<WatchableTest>(
-    new ICreator<WatchableTest>() {
+    new WatchDog<WatchableTest>(new ICreator<WatchableTest>() {
       @Override
       public WatchableTest create() {
         return new WatchableTest();
       }
-    }
-    );
+    });
     WatchableTest test = watchDog.getObject();
     Assert.assertNotNull(test);
     watchDog.setTimeout(100);
@@ -39,11 +37,12 @@ public class WatchDogTest {
       try {
         Thread.sleep(100);
       } catch (InterruptedException e) {
-        /* Do nothing */
+        /* Do nothing. */
       }
     }
 
     Assert.assertTrue(test.getCleanedUp());
+    watchDog.shutDown();
   }
 
   private static class WatchableTest implements IWatchable {
@@ -68,7 +67,7 @@ public class WatchDogTest {
           try {
             wait();
           } catch (InterruptedException e) {
-            /* Do nothing */
+            /* Do nothing. */
           }
         }
       }
@@ -77,6 +76,121 @@ public class WatchDogTest {
     @Override
     public void setWatcher(IWatcher w) {
       /* Do nothing, as we want cleanup to be called. */
+    }
+  }
+
+  @Test
+  public void testDyingRestart() {
+    IWatchDog<DyingTest> watchDog =
+    new WatchDog<DyingTest>(new ICreator<DyingTest>() {
+      @Override
+      public DyingTest create() {
+        return new DyingTest();
+      }
+    });
+
+    DyingTest test1 = watchDog.getObject();
+    Assert.assertNotNull(test1);
+    watchDog.setTimeout(10);
+
+    Thread watchDogThread = new Thread(watchDog);
+    watchDogThread.start();
+
+    /* Shorter than timeout so that we know cleanup was called because
+     * of notifyDying. */
+    long endTime = System.nanoTime()+5*1000*1000;
+    while (System.nanoTime() < endTime) {
+      try {
+        Thread.sleep(100);
+      } catch(InterruptedException e) {
+        /* Do nothing. */
+      }
+    }
+
+    DyingTest test2 = watchDog.getObject();
+    Assert.assertNotEquals(test1, test2);
+
+    watchDog.shutDown();
+  }
+
+  private static class DyingTest implements IWatchable {
+    IWatcher watcher;
+
+    @Override
+    public void cleanup() {
+    }
+
+    @Override
+    public void run() {
+      try {
+        /* Do nothing. */
+      } finally {
+        watcher.notifyDying();
+      }
+    }
+
+    @Override
+    public void setWatcher(IWatcher w) {
+      watcher = w;
+    }
+  }
+
+  @Test
+  public void testAliveDontRestart() {
+    IWatchDog<DontRestartTest> watchDog =
+    new WatchDog<DontRestartTest>(new ICreator<DontRestartTest>() {
+      @Override
+      public DontRestartTest create() {
+        return new DontRestartTest();
+      }
+    });
+
+    DontRestartTest test1 = watchDog.getObject();
+    Assert.assertNotNull(test1);
+    watchDog.setTimeout(100);
+
+    Thread watchDogThread = new Thread(watchDog);
+    watchDogThread.start();
+
+    long endTime = System.nanoTime()+200*1000*1000;
+    while (System.nanoTime() < endTime) {
+      try {
+        Thread.sleep(100);
+      } catch(InterruptedException e) {
+        /* Do nothing. */
+      }
+    }
+
+    DontRestartTest test2 = watchDog.getObject();
+    Assert.assertEquals(test1, test2);
+
+    watchDog.shutDown();
+  }
+
+  private static class DontRestartTest implements IWatchable {
+    IWatcher watcher;
+    boolean stop = false;
+
+    @Override
+    public void cleanup() {
+      stop = true;
+    }
+
+    @Override
+    public void setWatcher(IWatcher w) {
+      watcher = w;
+    }
+
+    @Override
+    public void run() {
+      while (!stop) {
+        try {
+          Thread.sleep(50);
+        } catch (InterruptedException e) {
+          /* Do nothing. */
+        }
+        watcher.notifyStillAlive();
+      }
     }
   }
 }
