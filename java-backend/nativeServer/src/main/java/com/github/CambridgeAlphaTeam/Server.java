@@ -31,9 +31,9 @@ public class Server {
         }
         sender = new OscSender();
         HttpServer server = HttpServer.create(new InetSocketAddress(8000), 0);
-        server.createContext("/hiworld", new LoggerHandler(new ExampleHandler()));
-        server.createContext("/rest/osc/run", new LoggerHandler(new RunCodeHandler()));
-        server.createContext("/rest/osc/stop", new LoggerHandler(new StopMusicHandler()));
+        server.createContext("/test/hiworld", new LoggerHandler(new ExampleHandler()));
+        server.createContext("/osc/run", new LoggerHandler(new RunCodeHandler()));
+        server.createContext("/osc/stop", new LoggerHandler(new StopMusicHandler()));
         server.createContext("/", new LoggerHandler(new FileHandler(args[0]))); // serves front end
         server.setExecutor(null); // creates a default executor
         server.start();
