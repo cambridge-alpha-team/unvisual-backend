@@ -96,7 +96,7 @@ public class WatchDogMonitor implements WatchDog, WatchDogNotify {
           }
 
           if ((System.nanoTime() - lastLifesign) > timeoutMillis*1000) {
-            stopTask();
+            restartTask();
           }
         } else {
           /* Wait for a thread to watch */
