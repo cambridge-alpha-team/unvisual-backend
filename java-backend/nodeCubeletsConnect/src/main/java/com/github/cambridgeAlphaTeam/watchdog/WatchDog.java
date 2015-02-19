@@ -13,8 +13,11 @@ public class WatchDog<T extends IWatchable> implements IWatchDog<T> {
   long millis;
   long lastLifesign;
 
-  public void stillAlive() {
+  public void notifyStillAlive() {
     lastLifesign = System.nanoTime();
+  }
+
+  public void notifyDying() {
   }
 
   public WatchDog(ICreator<T> creator) {
@@ -36,5 +39,6 @@ public class WatchDog<T extends IWatchable> implements IWatchDog<T> {
   }
 
   public void run() {
+    taskObject.cleanup();
   }
 }
