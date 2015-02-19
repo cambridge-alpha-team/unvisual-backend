@@ -20,12 +20,18 @@ public class WatchDog<T extends IWatchable> implements IWatchDog<T> {
   private static final Logger logger =
     LoggerFactory.getLogger(WatchDog.class);
 
-  public synchronized void notifyStillAlive() {
-    lastLifesign = System.nanoTime();
+  public synchronized void notifyStillAlive(IWatchable who) {
+    /* Only take messages from current task. */
+    if (taskObject == who) {
+      lastLifesign = System.nanoTime();
+    }
   }
 
-  public synchronized void notifyDying() {
-    restartTask();
+  public synchronized void notifyDying(IWatchable who) {
+    /* Only restart current task. */
+    if (taskObject == who) {
+      restartTask();
+    }
   }
 
   public synchronized void shutDown() {

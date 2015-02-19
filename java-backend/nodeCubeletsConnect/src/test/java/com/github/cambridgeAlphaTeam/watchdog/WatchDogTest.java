@@ -125,7 +125,7 @@ public class WatchDogTest {
       try {
         /* Do nothing. */
       } finally {
-        watcher.notifyDying();
+        watcher.notifyDying(this);
       }
     }
 
@@ -189,7 +189,72 @@ public class WatchDogTest {
         } catch (InterruptedException e) {
           /* Do nothing. */
         }
-        watcher.notifyStillAlive();
+        watcher.notifyStillAlive(this);
+      }
+    }
+  }
+
+  @Test
+  public void testAliveDontDoubleRestart() {
+    IWatchDog<DontDoubleRestartTest> watchDog =
+      new WatchDog<DontDoubleRestartTest>(new
+    ICreator<DontDoubleRestartTest>() {
+      @Override
+      public DontDoubleRestartTest create() {
+        return new DontDoubleRestartTest();
+      }
+    });
+
+    DontDoubleRestartTest test = watchDog.getObject();
+    Assert.assertNotNull(test);
+    watchDog.setTimeout(5);
+
+    Thread watchDogThread = new Thread(watchDog);
+    watchDogThread.start();
+
+    long endTime = System.nanoTime()+10*1000*1000;
+    while (System.nanoTime() < endTime) {
+      try {
+        Thread.sleep(10);
+      } catch(InterruptedException e) {
+        /* Do nothing. */
+      }
+    }
+
+    Assert.assertEquals(test.getCleanups(), 1);
+
+    watchDog.shutDown();
+  }
+
+  private static class DontDoubleRestartTest implements IWatchable {
+    IWatcher watcher;
+    int cleanups = 0;
+    public int getCleanups() {
+      return cleanups;
+    }
+
+    @Override
+    public void cleanup() {
+      cleanups++;
+    }
+
+    @Override
+    public void setWatcher(IWatcher w) {
+      watcher = w;
+    }
+
+    @Override
+    public void run() {
+      try {
+        while (cleanups == 0) {
+          try {
+            Thread.sleep(10);
+          } catch (InterruptedException e) {
+            /* Do nothing. */
+          }
+        }
+      } finally {
+        watcher.notifyDying(this);
       }
     }
   }

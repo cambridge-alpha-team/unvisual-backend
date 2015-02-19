@@ -5,6 +5,6 @@ package com.github.cambridgeAlphaTeam.watchdog;
  * object (that is of the type T, a type parameter).
  * @author Kovacsics Robert &lt;rmk35@cam.ac.uk&gt;
  */
-interface ICreator<T> {
+public interface ICreator<T> {
   public T create();
 }

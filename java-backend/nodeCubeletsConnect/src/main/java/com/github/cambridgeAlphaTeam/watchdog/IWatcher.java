@@ -8,7 +8,7 @@ package com.github.cambridgeAlphaTeam.watchdog;
  * called.
  * @author Kovacsics Robert &lt;rmk35@cam.ac.uk&gt;
  */
-interface IWatcher {
-  public void notifyStillAlive();
-  public void notifyDying();
+public interface IWatcher {
+  public void notifyStillAlive(IWatchable who);
+  public void notifyDying(IWatchable who);
 }
