@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
  * @author Kovacsics Robert &lt;rmk35@cam.ac.uk&gt;
  */
 
-class LoggerHandler implements HttpHandler {
+public class LoggerHandler implements HttpHandler {
   private final HttpHandler delegateHandler;
   private static final Logger logger =
     LoggerFactory.getLogger(LoggerHandler.class);
