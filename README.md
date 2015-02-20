@@ -11,7 +11,7 @@ Java &amp; node.js backend. Pulls in unvisual-frontend as submodule.
 ```sh
 mvn package &&
 mvn exec:java \
-  -Dexec.mainClass="com.github.CambridgeAlphaTeam.Server" \
+  -Dexec.mainClass="com.github.cambridgeAlphaTeam.Server" \
   -Dexec.args={unvisual-frontend}
 ```
 where `{unvisual-frontend}` is the location of the front end repository.
