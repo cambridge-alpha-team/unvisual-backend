@@ -4,3 +4,6 @@
 
 * tomcatServerBackend contains the Java backend and uses the frontend as a submodule.
   It depends on the above libraries, so run `mvn install` on both of the above.
+
+* nativeServer replaces tomcatServerBackend, wo that you don't have to
+  install Tomcat.
