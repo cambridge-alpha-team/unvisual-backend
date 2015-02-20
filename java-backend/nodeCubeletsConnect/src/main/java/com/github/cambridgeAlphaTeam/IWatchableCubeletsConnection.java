@@ -7,6 +7,6 @@ import com.github.cambridgeAlphaTeam.watchdog.IWatchable;
  * @author Kovacsics Robert &lt;rmk35@cam.ac.uk&gt;
  */
 
-interface CubeletsConnection {
-  public int[] getCubeletValues();
+interface IWatchableCubeletsConnection extends IWatchable,
+  ICubeletsConnection {
 }
