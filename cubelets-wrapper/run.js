@@ -1,14 +1,36 @@
 var cubelets = require('./node-cubelets');
 var BlockValueEventResponse = require('./node-cubelets/response/blockValueEvent.js');
 
+var PATH = null; // '/dev/cu.Cubelet-RYB-AMP-SPP';
+
+
 
 // Connecting to Cubelet
 
-var scanner = new cubelets.BluetoothScanner('Cubelet-RYB');
+function withConnection(cb) {
+  if (PATH) {
+    var connection = new cubelets.SerialConnection({
+      path: PATH,
+    });
+    console.error("Using " + PATH);
+    cb(connection);
 
-scanner.scan();
+  } else {
+    var scanner = new cubelets.BluetoothScanner('Cubelet-RYB');
+    scanner.scan();
 
-scanner.on('pass', function(connection, name, config) {
+    console.error("Scanning...");
+
+    scanner.on('pass', function(connection, name, config) {
+      cb(connection);
+    });
+  }
+}
+
+
+// Once we have a connection...
+
+withConnection(function(connection) {
 
   connection.on('open', function() {
     console.error('Connection open');
