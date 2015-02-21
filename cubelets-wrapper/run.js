@@ -74,6 +74,8 @@ withConnection(function(connection) {
     }
   }
 
+  var seenIds = [];
+
   construction.on('change', function() {
     hasMap = true;
 
@@ -83,16 +85,29 @@ withConnection(function(connection) {
     console.error('The direct neighbors are near \n', pretty(construction.near()), '\n');
     console.error('The other cubelets are far \n', pretty(construction.far()), '\n');
 
-    construction.all().forEach(function(cubelet) {
+    var currentIds = [];
+
+    construction.all().forEach(function(cubelet, index) {
       var id = cubelet.id;
-      if (!values.hasOwnProperty(id)) {
-        values[id] = null;
-        grabCubelets.push(id);
+      if (id === construction.origin().id) return;
+
+      if (seenIds.indexOf(id) === -1) {
+        seenIds.push(id);
+        currentIds.push(id);
 
         var command = new cubelets.RegisterBlockValueEventCommand(id);
         connection.postCommand(command);
+        console.error("Subscribing to " + id + "...");
       }
     });
+
+    Object.keys(values, function(id) {
+      if (currentIds.indexOf(id) > -1) {
+        delete values[id];
+      }
+    });
+
+    process.stdout.write(JSON.stringify(values) + "\n");
 
     lastChange = new Date();
     sent = false;
@@ -103,35 +118,13 @@ withConnection(function(connection) {
   // and output updated values dict
 
   var values = {};
-  var grabCubelets = [];
 
-  construction.on('value', function(response) {
-    if (response.type.code === 'b') {
-      var r = new BlockValueEventResponse(response.data, 'b');
-
-      var index = grabCubelets.indexOf(r.id);
-      if (index !== -1) {
-        grabCubelets.splice(index, 1);
-      }
-
-      values[r.id] = r.value;
-      console.log(values);
+  connection.on('response', function(response) {
+    if (response.type === cubelets.Responses.BLOCK_VALUE_EVENT) {
+      values[response.id] = response.value;
+      process.stdout.write(JSON.stringify(values) + "\n");
     }
   });
-
-
-  // If subscribing to a block failed the first time, try it again.
-  // This never works!
-
-  setInterval(function() {
-    if (!connection.isOpen()) return;
-
-    grabCubelets.forEach(function(id) {
-      var command = new cubelets.RegisterBlockValueEventCommand(id);
-      connection.postCommand(command);
-      console.error("grabbing " + id);
-    });
-  }, 1000);
 
 });
 
