@@ -40,7 +40,7 @@
           </descriptorRefs>
           <archive>
             <manifest>
-              <mainClass>com.github.CambridgeAlphaTeam.Server</mainClass>
+              <mainClass>com.github.cambridgeAlphaTeam.Server</mainClass>
             </manifest>
           </archive>
         </configuration>
