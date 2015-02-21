@@ -1,4 +1,4 @@
-package com.github.CambridgeAlphaTeam;
+package com.github.cambridgeAlphaTeam;
 
 import java.io.BufferedReader;
 import java.io.IOException;
