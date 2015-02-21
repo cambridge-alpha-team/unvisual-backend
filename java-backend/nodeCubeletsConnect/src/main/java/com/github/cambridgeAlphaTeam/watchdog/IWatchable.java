@@ -6,7 +6,7 @@ package com.github.cambridgeAlphaTeam.watchdog;
  * It will automatically be run.
  * @author Kovacsics Robert &lt;rmk35@cam.ac.uk&gt;
  */
-interface IWatchable extends Runnable {
+public interface IWatchable extends Runnable {
   public void cleanup();
   public void setWatcher(IWatcher w);
 }
