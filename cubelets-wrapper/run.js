@@ -45,9 +45,20 @@ withConnection(function(connection) {
 
   var construction = new cubelets.Construction(connection);
 
+  var hasMap = false;
+
   construction.connect(function() {
-    console.error('Construction connected, sending discover()');
-    construction.discover();
+    console.error('Construction connected');
+
+    function discover() {
+      if (hasMap) return;
+      construction.discover();
+      setTimeout(discover, 5000);
+
+      console.log('Sending discover...')
+    }
+
+    discover();
   });
 
 
@@ -64,6 +75,8 @@ withConnection(function(connection) {
   }
 
   construction.on('change', function() {
+    hasMap = true;
+
     process.stderr.write("\u001b[2J\u001b[0;0H"); // clear the terminal
     console.error('Construction changed:');
     console.error('The origin is \n', pretty(construction.origin()), '\n');
