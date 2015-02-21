@@ -48,23 +48,36 @@ class FileHandler implements HttpHandler {
 
     /* 404 */
     if (requestedFile.exists()) {
-      t.sendResponseHeaders(200, requestedFile.length());
+      if (requestedFile.isFile()) {
+        t.sendResponseHeaders(200, requestedFile.length());
+        OutputStream os = t.getResponseBody();
+        writeFile(requestedFile, os);
+        t.close();
+        return;
+      } else if (requestedFile.isDirectory()) {
+        File greeter = new File(requestedFile, "index.html");
+        if (greeter.isFile()) {
+          t.sendResponseHeaders(200, greeter.length());
+          OutputStream os = t.getResponseBody();
+          writeFile(greeter, os);
+          t.close();
+          return;
+        }
+      }
+    }
+
+    /* If we had no errors, we should not get this far. */
+    if (null != notFoundFile && notFoundFile.exists()) {
+      t.sendResponseHeaders(404, notFoundFile.length());
       OutputStream os = t.getResponseBody();
-      writeFile(requestedFile, os);
+      writeFile(notFoundFile, os);
       t.close();
     } else {
-      if (null != notFoundFile && notFoundFile.exists()) {
-        t.sendResponseHeaders(404, notFoundFile.length());
-        OutputStream os = t.getResponseBody();
-        writeFile(notFoundFile, os);
-        t.close();
-      } else {
-        byte[] response = "Error 404: File not found".getBytes();
-        t.sendResponseHeaders(404, response.length);
-        OutputStream os = t.getResponseBody();
-        os.write(response);
-        t.close();
-      }
+      byte[] response = "Error 404: File not found".getBytes();
+      t.sendResponseHeaders(404, response.length);
+      OutputStream os = t.getResponseBody();
+      os.write(response);
+      t.close();
     }
   }
 
