@@ -8,6 +8,7 @@ import java.io.OutputStream;
 import java.net.InetSocketAddress;
 
 import java.util.Formatter;
+import java.util.Arrays;
 
 import com.github.cambridgeAlphaTeam.OscException;
 import com.github.cambridgeAlphaTeam.OscSender;
@@ -33,10 +34,15 @@ public class Server {
     private static final Logger logger = LoggerFactory.getLogger(Server.class);
 
     public static void main(String[] args) throws IOException, OscException {
-        if (args.length != 1) {
-            System.err.println("Give precisely one argument, the location of the front end files to serve");
+        if (args.length < 2) {
+            System.err.println("Usage:\njava -jar \"this jar file\" " +
+                "\"location of frontend\" " +
+                "\"program returning cubelet values\" " +
+                "[optional arguments for said program]");
             return;
         }
+        final String[] cubeletsProcessCmd = Arrays.copyOfRange(args, 1, args.length);
+
         sender = new OscSender();
         HttpServer server = HttpServer.create(new InetSocketAddress(8000), 0);
 
@@ -55,9 +61,9 @@ public class Server {
             new WatchDog<IWatchableCubeletsConnection>(
                     new ICreator<IWatchableCubeletsConnection>() {
                         @Override
-                        public ExecCubeletsConnection create() {
+                        public OscExecCubeletsConnection create() {
                             try {
-                                return new OscExecCubeletsConnection(args);
+                                return new OscExecCubeletsConnection(cubeletsProcessCmd, sender);
                             } catch (IOException e) {
                                 logger.error("Unable to open process!", e);
                                 return null;
@@ -69,16 +75,6 @@ public class Server {
         watchDogThread.start();
 
         logger.info("Server started");
-    }
-
-    static class ExampleHandler implements HttpHandler {
-        public void handle(HttpExchange t) throws IOException {
-            String response = "Hello World!";
-            t.sendResponseHeaders(200, response.length());
-            OutputStream os = t.getResponseBody();
-            os.write(response.getBytes());
-            os.close();
-        }
     }
 
     static class RunCodeHandler implements HttpHandler {
@@ -113,10 +109,11 @@ public class Server {
     }
 
     static class OscExecCubeletsConnection extends ExecCubeletsConnection {
-        private static OscSender sender;
+        private OscSender sender;
 
-        public OscExecCubeletsConnection(final String[] cmdarray) throws IOException {
+        public OscExecCubeletsConnection(final String[] cmdarray, OscSender sender) throws IOException {
             super(cmdarray);
+            this.sender = sender;
         }
 
         public void messageHandle(int[] cubeletValues) {
@@ -140,11 +137,17 @@ public class Server {
             formatter.format("  scaled = range*unscaled/255%n");
 
             /* This floors to the granularity. */
-            formatter.format("  roundoff = scaled % granularity%n");
+            formatter.format("  roundoff = scaled %% granularity%n");
             formatter.format("  return min + scaled - roundoff%n");
             formatter.format("end%n");
 
-            sender.sendCode(strb.toString());
+            logger.info(strb.toString());
+
+            try {
+                sender.sendCode(strb.toString());
+            } catch (OscException e) {
+                logger.error("Unhandler OscException in trying to send cubelet values", e);
+            }
         }
     }
 }
