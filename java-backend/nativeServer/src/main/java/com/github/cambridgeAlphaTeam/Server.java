@@ -134,7 +134,7 @@ public class Server {
             /* TODO: What should the default be? */
             formatter.format("               else        %d%n", 0);
             formatter.format("             end%n");
-            formatter.format("  scaled = range*unscaled/255%n");
+            formatter.format("  scaled = range*unscaled/255.0%n");
 
             /* This floors to the granularity. */
             formatter.format("  roundoff = scaled %% granularity%n");
