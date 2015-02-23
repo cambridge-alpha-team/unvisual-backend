@@ -1,5 +1,5 @@
 # unvisual-backend
-Java &amp; node.js backend. Pulls in [unvisual-frontend](https://github.com/cambridge-alpha-team/unvisual-frontend) as submodule.
+Java &amp; node.js backend.
 
 ## Getting the server running
 
@@ -8,7 +8,7 @@ Java &amp; node.js backend. Pulls in [unvisual-frontend](https://github.com/camb
 3. Change directory to `{unvisual-backend}/java-backend/oscSender` and run `mvn install`.
 4. Change directory to `{unvisual-backend}/java-backend/nodeCubeletsConnect` and run `mvn install`.
 5. Change directory to `{unvisual-backend}/java-backend/nativeServer`.
-6. Run `mvn package` then you can run the `*-jar-with-dependencies.jar` file under `target/`, with the argument of `{unvisual-frontend}`.
+6. Run `mvn package` then you can run the `*-jar-with-dependencies.jar` file under `target/`, with the argument of `{unvisual-frontend}` and the program reading in the cubelets values.
 7. Make sure that you have started Sonic Pi (i.e. you have the Sonic Pi app running, for now).
 8. Go to [localhost:8000/index.html](http://localhost:8000/index.html) to use the project.
 
