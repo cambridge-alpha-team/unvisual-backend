@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
  */
 
 public class ServerCubeletsConnection extends Thread implements
-  CubeletsConnection {
+  ICubeletsConnection {
   private int[] cubeletValues;
 
   private ServerSocket listenSocket;
@@ -108,5 +108,13 @@ public class ServerCubeletsConnection extends Thread implements
         break;
       }
     }
+
+    messageHandle(cubeletValues);
+  }
+
+  public void messageHandle(int[] cubeletValues) {
+    /* In case subclassing, you can override this. It is called when
+     * cubelet values change.
+     */
   }
 }

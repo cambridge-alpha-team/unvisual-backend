@@ -17,7 +17,7 @@ import com.sun.net.httpserver.*;
  * @author Kovacsics Robert &lt;rmk35@cam.ac.uk&gt;
  */
 
-class FileHandler implements HttpHandler {
+public class FileHandler implements HttpHandler {
   /* Where to serve files from */
   private final String servePath;
   /* The path for 404.html */

@@ -1,6 +1,5 @@
 package com.github.cambridgeAlphaTeam;
 
-import com.github.cambridgeAlphaTeam.watchdog.IWatchable;
 import com.github.cambridgeAlphaTeam.watchdog.IWatcher;
 
 import java.io.InputStream;
@@ -25,8 +24,8 @@ import org.slf4j.LoggerFactory;
  * @author Kovacsics Robert &lt;rmk35@cam.ac.uk&gt;
  */
 
-public class ExecCubeletsConnection implements CubeletsConnection,
-  IWatchable {
+public class ExecCubeletsConnection implements
+  IWatchableCubeletsConnection {
   private IWatcher watcher;
   private boolean stop = false;
 
@@ -51,6 +50,28 @@ public class ExecCubeletsConnection implements CubeletsConnection,
     try {
       BufferedReader reader = new BufferedReader(new InputStreamReader(
             cubeletsProcess.getInputStream()));
+
+      Thread logSTDERR = new Thread() {
+        @Override
+        public void run() {
+          BufferedReader reader = new BufferedReader(new InputStreamReader(
+                cubeletsProcess.getErrorStream()));
+          while (!stop) {
+            String line;
+            try {
+              line = reader.readLine();
+            } catch (IOException e) {
+              logger.error("Failed to read an STDERR line from cubelets child process.", e);
+              return;
+            }
+
+            if (line != null) {
+              logger.error("STDERR:" + line);
+            }
+          }
+        }
+      };
+      logSTDERR.run();
 
       while (!stop) {
         String line;
@@ -119,5 +140,13 @@ public class ExecCubeletsConnection implements CubeletsConnection,
         break;
       }
     }
+
+    messageHandle(cubeletValues);
+  }
+
+  public void messageHandle(int[] cubeletValues) {
+    /* In case subclassing, you can override this. It is called when
+     * cubelet values change.
+     */
   }
 }

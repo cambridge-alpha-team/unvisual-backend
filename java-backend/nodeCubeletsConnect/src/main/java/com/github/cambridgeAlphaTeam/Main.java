@@ -20,12 +20,12 @@ public class Main {
     NumberFormatException,
     IOException {
     if (args.length > 0) {
-      //CubeletsConnection conn = new ServerCubeletsConnection(
+      //ICubeletsConnection conn = new ServerCubeletsConnection(
       //  Integer.parseInt(args[0]));
 
-      IWatchDog<ExecCubeletsConnection> watchDog =
-        new WatchDog<ExecCubeletsConnection>(
-      new ICreator<ExecCubeletsConnection>() {
+      IWatchDog<IWatchableCubeletsConnection> watchDog =
+        new WatchDog<IWatchableCubeletsConnection>(
+      new ICreator<IWatchableCubeletsConnection>() {
         @Override
         public ExecCubeletsConnection create() {
           try {
