@@ -58,7 +58,7 @@ public class Server {
         logger.info("Server started");
 
         if (args.length < 2) {
-            logger.warning("No cubelet program provided");
+            logger.warn("No cubelet program provided");
             return; // Cubelets not being used
         }
 
