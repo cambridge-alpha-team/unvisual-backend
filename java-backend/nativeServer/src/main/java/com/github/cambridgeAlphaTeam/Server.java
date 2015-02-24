@@ -57,29 +57,28 @@ public class Server {
 
         logger.info("Server started");
 
-        if (args.length < 2) {
-            logger.warn("No cubelet program provided");
-            return; // Cubelets not being used
-        }
-
-        final String[] cubeletsProcessCmd = Arrays.copyOfRange(args, 1, args.length);
-        /* Cubelets connection */
-        IWatchDog<IWatchableCubeletsConnection> watchDog =
-            new WatchDog<IWatchableCubeletsConnection>(
-                    new ICreator<IWatchableCubeletsConnection>() {
-                        @Override
-                        public OscExecCubeletsConnection create() {
-                            try {
-                                return new OscExecCubeletsConnection(cubeletsProcessCmd, sender);
-                            } catch (IOException e) {
-                                logger.error("Unable to open process!", e);
-                                return null;
+        if (args.length >= 2) {
+            final String[] cubeletsProcessCmd = Arrays.copyOfRange(args, 1, args.length);
+            /* Cubelets connection */
+            IWatchDog<IWatchableCubeletsConnection> watchDog =
+                new WatchDog<IWatchableCubeletsConnection>(
+                        new ICreator<IWatchableCubeletsConnection>() {
+                            @Override
+                            public OscExecCubeletsConnection create() {
+                                try {
+                                    return new OscExecCubeletsConnection(cubeletsProcessCmd, sender);
+                                } catch (IOException e) {
+                                    logger.error("Unable to open process!", e);
+                                    return null;
+                                }
                             }
-                        }
-                    });
-        watchDog.setTimeout(2000);
-        Thread watchDogThread = new Thread(watchDog);
-        watchDogThread.start();
+                        });
+                watchDog.setTimeout(2000);
+            Thread watchDogThread = new Thread(watchDog);
+            watchDogThread.start();
+        } else {
+           logger.warn("No cubelet program provided: cubelet functionality not being used");
+        } 
     }
 
     static class RunCodeHandler implements HttpHandler {
