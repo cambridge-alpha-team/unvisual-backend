@@ -51,6 +51,28 @@ public class ExecCubeletsConnection implements
       BufferedReader reader = new BufferedReader(new InputStreamReader(
             cubeletsProcess.getInputStream()));
 
+      Thread logSTDERR = new Thread() {
+        @Override
+        public void run() {
+          BufferedReader reader = new BufferedReader(new InputStreamReader(
+                cubeletsProcess.getErrorStream()));
+          while (!stop) {
+            String line;
+            try {
+              line = reader.readLine();
+            } catch (IOException e) {
+              logger.error("Failed to read an STDERR line from cubelets child process.", e);
+              return;
+            }
+
+            if (line != null) {
+              logger.error("STDERR:" + line);
+            }
+          }
+        }
+      };
+      logSTDERR.run();
+
       while (!stop) {
         String line;
         try {
