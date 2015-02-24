@@ -34,14 +34,13 @@ public class Server {
     private static final Logger logger = LoggerFactory.getLogger(Server.class);
 
     public static void main(String[] args) throws IOException, OscException {
-        if (args.length < 2) {
+        if (args.length < 1) {
             System.err.println("Usage:\njava -jar \"this jar file\" " +
                 "\"location of frontend\" " +
-                "\"program returning cubelet values\" " +
+                "[\"program returning cubelet values\"] " +
                 "[optional arguments for said program]");
             return;
         }
-        final String[] cubeletsProcessCmd = Arrays.copyOfRange(args, 1, args.length);
 
         sender = new OscSender();
         HttpServer server = HttpServer.create(new InetSocketAddress(8000), 0);
@@ -56,6 +55,14 @@ public class Server {
         server.setExecutor(null); // creates a default executor
         server.start();
 
+        logger.info("Server started");
+
+        if (args.length < 2) {
+            logger.warning("No cubelet program provided");
+            return; // Cubelets not being used
+        }
+
+        final String[] cubeletsProcessCmd = Arrays.copyOfRange(args, 1, args.length);
         /* Cubelets connection */
         IWatchDog<IWatchableCubeletsConnection> watchDog =
             new WatchDog<IWatchableCubeletsConnection>(
@@ -73,8 +80,6 @@ public class Server {
         watchDog.setTimeout(2000);
         Thread watchDogThread = new Thread(watchDog);
         watchDogThread.start();
-
-        logger.info("Server started");
     }
 
     static class RunCodeHandler implements HttpHandler {
