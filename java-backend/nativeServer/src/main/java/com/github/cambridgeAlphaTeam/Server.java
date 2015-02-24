@@ -34,14 +34,13 @@ public class Server {
     private static final Logger logger = LoggerFactory.getLogger(Server.class);
 
     public static void main(String[] args) throws IOException, OscException {
-        if (args.length < 2) {
+        if (args.length < 1) {
             System.err.println("Usage:\njava -jar \"this jar file\" " +
                 "\"location of frontend\" " +
-                "\"program returning cubelet values\" " +
+                "[\"program returning cubelet values\"] " +
                 "[optional arguments for said program]");
             return;
         }
-        final String[] cubeletsProcessCmd = Arrays.copyOfRange(args, 1, args.length);
 
         sender = new OscSender();
         HttpServer server = HttpServer.create(new InetSocketAddress(8000), 0);
@@ -56,25 +55,30 @@ public class Server {
         server.setExecutor(null); // creates a default executor
         server.start();
 
-        /* Cubelets connection */
-        IWatchDog<IWatchableCubeletsConnection> watchDog =
-            new WatchDog<IWatchableCubeletsConnection>(
-                    new ICreator<IWatchableCubeletsConnection>() {
-                        @Override
-                        public OscExecCubeletsConnection create() {
-                            try {
-                                return new OscExecCubeletsConnection(cubeletsProcessCmd, sender);
-                            } catch (IOException e) {
-                                logger.error("Unable to open process!", e);
-                                return null;
-                            }
-                        }
-                    });
-        watchDog.setTimeout(2000);
-        Thread watchDogThread = new Thread(watchDog);
-        watchDogThread.start();
-
         logger.info("Server started");
+
+        if (args.length >= 2) {
+            final String[] cubeletsProcessCmd = Arrays.copyOfRange(args, 1, args.length);
+            /* Cubelets connection */
+            IWatchDog<IWatchableCubeletsConnection> watchDog =
+                new WatchDog<IWatchableCubeletsConnection>(
+                        new ICreator<IWatchableCubeletsConnection>() {
+                            @Override
+                            public OscExecCubeletsConnection create() {
+                                try {
+                                    return new OscExecCubeletsConnection(cubeletsProcessCmd, sender);
+                                } catch (IOException e) {
+                                    logger.error("Unable to open process!", e);
+                                    return null;
+                                }
+                            }
+                        });
+                watchDog.setTimeout(2000);
+            Thread watchDogThread = new Thread(watchDog);
+            watchDogThread.start();
+        } else {
+           logger.warn("No cubelet program provided: cubelet functionality not being used");
+        } 
     }
 
     static class RunCodeHandler implements HttpHandler {
