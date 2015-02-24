@@ -1,12 +1,12 @@
 To compile and test:
 ```sh
-cat <<EOF > target/run-test.sh
+cat <<'EOF' > target/run-test.sh
 #!/bin/sh
 VAL=0
 while true; do
-  cat <<EOF # | nc localhost 8080
+  cat <<EOIF # | nc localhost 8080
 { "95934": null, "96031": ${VAL},  "96147": 0, "96302": null }
-EOF
+EOIF
   VAL=$(((${VAL}+1)%256))
   sleep 1s
   # To test watchdog

@@ -114,6 +114,8 @@ public class Server {
         public OscExecCubeletsConnection(final String[] cmdarray, OscSender sender) throws IOException {
             super(cmdarray);
             this.sender = sender;
+            /* Fill in Sonic Pi with something */
+            messageHandle(new int[]{0, 0, 0, 0, 0, 0});
         }
 
         public void messageHandle(int[] cubeletValues) {
@@ -121,18 +123,16 @@ public class Server {
             // Send all output to the Appendable object sb
             Formatter formatter = new Formatter(strb);
 
-            formatter.format("def getCubeletValue(number, min, max, granularity)%n");
+            formatter.format("def getCubeletValue(number, min, max, granularity, default)%n");
             formatter.format("  range = max-min%n");
             formatter.format("  unscaled = case number %n");
-            formatter.format("               when 0 then %d%n", cubeletValues[0]);
-            formatter.format("               when 1 then %d%n", cubeletValues[1]);
-            formatter.format("               when 2 then %d%n", cubeletValues[2]);
-            formatter.format("               when 3 then %d%n", cubeletValues[3]);
-            formatter.format("               when 4 then %d%n", cubeletValues[4]);
-            formatter.format("               when 5 then %d%n", cubeletValues[5]);
-
-            /* TODO: What should the default be? */
-            formatter.format("               else        %d%n", 0);
+            formatter.format("               when 1 then %d%n", cubeletValues[0]);
+            formatter.format("               when 2 then %d%n", cubeletValues[1]);
+            formatter.format("               when 3 then %d%n", cubeletValues[2]);
+            formatter.format("               when 4 then %d%n", cubeletValues[3]);
+            formatter.format("               when 5 then %d%n", cubeletValues[4]);
+            formatter.format("               when 6 then %d%n", cubeletValues[5]);
+            formatter.format("               else        default%n");
             formatter.format("             end%n");
             formatter.format("  scaled = range*unscaled/255.0%n");
 
