@@ -17,7 +17,7 @@ public class WatchDog<T extends IWatchable> implements IWatchDog<T> {
   boolean startingUp = false;
 
   long timeoutMillis;
-  long startupTimeoutMillis = 0;
+  long startupTimeoutMillis;
   long lastLifesign;
 
   private static final Logger logger =
@@ -34,6 +34,7 @@ public class WatchDog<T extends IWatchable> implements IWatchDog<T> {
   public synchronized void notifyDying(IWatchable who) {
     /* Only restart current task. */
     if (taskObject == who) {
+      logger.debug("Restarting task: " + taskObject);
       restartTask();
     }
   }
@@ -49,6 +50,7 @@ public class WatchDog<T extends IWatchable> implements IWatchDog<T> {
   }
 
   public synchronized void startTask() {
+    logger.debug("Starting task: " + taskObject);
     taskObject = creator.create();
     taskObject.setWatcher(this);
     taskThread = new Thread(taskObject);
@@ -56,6 +58,7 @@ public class WatchDog<T extends IWatchable> implements IWatchDog<T> {
   }
 
   public synchronized void stopTask() {
+    logger.debug("Stopping task: " + taskObject);
     taskObject.cleanup();
   }
 
@@ -68,7 +71,7 @@ public class WatchDog<T extends IWatchable> implements IWatchDog<T> {
     return taskObject;
   }
 
-  public void setStartupTimeout(long startupTimeoutMillis) {
+  public synchronized void setStartupTimeout(long startupTimeoutMillis) {
     this.startingUp = true;
     this.startupTimeoutMillis = startupTimeoutMillis;
   }
@@ -78,6 +81,7 @@ public class WatchDog<T extends IWatchable> implements IWatchDog<T> {
   }
 
   public void run() {
+    lastLifesign = System.nanoTime();
     while (!shutDown) {
       /* Acquire lock and go to sleep. */
       synchronized (this) {
@@ -89,8 +93,19 @@ public class WatchDog<T extends IWatchable> implements IWatchDog<T> {
 
         /* Check timeout, if elapsed restart task.  Milliseconds are
          * converted to nanoseconds. */
-        long timeout = startingUp?startupTimeoutMillis:timeoutMillis;
+        long timeout;
+        if (startingUp)
+        {
+          logger.debug("Using startupTimeoutMillis of " + startupTimeoutMillis);
+          timeout = startupTimeoutMillis;
+        }
+        else
+        {
+          logger.debug("Using timeoutMillis of " + timeoutMillis);
+          timeout = timeoutMillis;
+        }
         if (System.nanoTime() - lastLifesign > timeout*1000*1000) {
+          logger.debug("Restarting due to timeout expiration.");
           restartTask();
         }
       }

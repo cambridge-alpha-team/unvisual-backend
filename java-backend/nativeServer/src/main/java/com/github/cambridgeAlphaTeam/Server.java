@@ -116,7 +116,8 @@ public class Server {
             super(cmdarray);
             this.sender = sender;
             /* Fill in Sonic Pi with something */
-            messageHandle(new int[]{0, 0, 0, 0, 0, 0});
+            logger.info("Feeding zero cubelet values to Sonic Pi");
+            // messageHandle(new int[]{0, 0, 0, 0, 0, 0});
         }
 
         public void messageHandle(int[] cubeletValues) {

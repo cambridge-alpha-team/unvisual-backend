@@ -71,7 +71,7 @@ public class ExecCubeletsConnection implements
           }
         }
       };
-      logSTDERR.run();
+      logSTDERR.start();
 
       while (!stop) {
         String line;
