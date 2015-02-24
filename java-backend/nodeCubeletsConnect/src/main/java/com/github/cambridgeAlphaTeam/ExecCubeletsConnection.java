@@ -37,17 +37,19 @@ public class ExecCubeletsConnection implements
   Process cubeletsProcess;
 
   /* Needs to be LinkedHashSet as that preserves insertion order. */
-  private LinkedHashSet<Integer> knownCubelets = new LinkedHashSet<Integer>();
+  private SaveKnownCubelets knownCubelets;
 
   private static final Logger logger =
     LoggerFactory.getLogger(ExecCubeletsConnection.class);
 
-  public ExecCubeletsConnection(final String[] cmdarray) throws
+  public ExecCubeletsConnection(final String[] cmdarray, SaveKnownCubelets saveKnownCubelets) throws
     IOException {
     /* One for each face of the Bluetooth cube */
     cubeletValues = new int[6];
 
     cubeletsProcess = Runtime.getRuntime().exec(cmdarray);
+
+    knownCubelets = saveKnownCubelets;
   }
 
   @Override
@@ -139,7 +141,7 @@ public class ExecCubeletsConnection implements
       if (i < 6) {
         Integer value = cubeletsMap.get(key);
         if (value != null) {
-          knownCubelets.add(key);
+          knownCubelets.getKnownCubelets().add(key);
         }
         i++;
       } else {
@@ -149,7 +151,7 @@ public class ExecCubeletsConnection implements
 
     /* Actually update cubeletValues. */
     i = 0;
-    for (Integer key : knownCubelets)
+    for (Integer key : knownCubelets.getKnownCubelets())
     {
       if (i < 6) {
         Integer value = cubeletsMap.get(key);
@@ -169,5 +171,11 @@ public class ExecCubeletsConnection implements
     /* In case subclassing, you can override this. It is called when
      * cubelet values change.
      */
+  }
+
+  public static class SaveKnownCubelets {
+    private LinkedHashSet<Integer> savedKnownCubelets = new LinkedHashSet<Integer>();
+    synchronized LinkedHashSet<Integer> getKnownCubelets() { return savedKnownCubelets; }
+    synchronized void setKnownCubelets(LinkedHashSet<Integer> knownCubelets) { savedKnownCubelets = knownCubelets; }
   }
 }

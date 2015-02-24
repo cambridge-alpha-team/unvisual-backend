@@ -57,13 +57,14 @@ public class Server {
         server.start();
 
         /* Cubelets connection */
+        final ExecCubeletsConnection.SaveKnownCubelets knownCubelets = new ExecCubeletsConnection.SaveKnownCubelets();
         IWatchDog<IWatchableCubeletsConnection> watchDog =
             new WatchDog<IWatchableCubeletsConnection>(
                     new ICreator<IWatchableCubeletsConnection>() {
                         @Override
                         public OscExecCubeletsConnection create() {
                             try {
-                                return new OscExecCubeletsConnection(cubeletsProcessCmd, sender);
+                                return new OscExecCubeletsConnection(cubeletsProcessCmd, knownCubelets, sender);
                             } catch (IOException e) {
                                 logger.error("Unable to open process!", e);
                                 return null;
@@ -112,8 +113,8 @@ public class Server {
     static class OscExecCubeletsConnection extends ExecCubeletsConnection {
         private OscSender sender;
 
-        public OscExecCubeletsConnection(final String[] cmdarray, OscSender sender) throws IOException {
-            super(cmdarray);
+        public OscExecCubeletsConnection(final String[] cmdarray, SaveKnownCubelets knownCubelets, OscSender sender) throws IOException {
+            super(cmdarray, knownCubelets);
             this.sender = sender;
             /* Fill in Sonic Pi with something */
             logger.info("Feeding zero cubelet values to Sonic Pi");
