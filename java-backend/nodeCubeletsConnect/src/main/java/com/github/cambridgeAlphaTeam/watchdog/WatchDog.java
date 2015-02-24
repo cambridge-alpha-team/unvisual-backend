@@ -13,8 +13,11 @@ public class WatchDog<T extends IWatchable> implements IWatchDog<T> {
   T taskObject;
   Thread taskThread;
   boolean shutDown = false;
+  /* Set by setStartupTimeout, unset by notifyStillAlive */
+  boolean startingUp = false;
 
   long timeoutMillis;
+  long startupTimeoutMillis = 0;
   long lastLifesign;
 
   private static final Logger logger =
@@ -22,6 +25,7 @@ public class WatchDog<T extends IWatchable> implements IWatchDog<T> {
 
   public synchronized void notifyStillAlive(IWatchable who) {
     /* Only take messages from current task. */
+    startingUp = false;
     if (taskObject == who) {
       lastLifesign = System.nanoTime();
     }
@@ -64,6 +68,11 @@ public class WatchDog<T extends IWatchable> implements IWatchDog<T> {
     return taskObject;
   }
 
+  public void setStartupTimeout(long startupTimeoutMillis) {
+    this.startingUp = true;
+    this.startupTimeoutMillis = startupTimeoutMillis;
+  }
+
   public void setTimeout(long timeoutMillis) {
     this.timeoutMillis = timeoutMillis;
   }
@@ -80,7 +89,8 @@ public class WatchDog<T extends IWatchable> implements IWatchDog<T> {
 
         /* Check timeout, if elapsed restart task.  Milliseconds are
          * converted to nanoseconds. */
-        if (System.nanoTime() - lastLifesign > timeoutMillis*1000*1000) {
+        long timeout = startingUp?startupTimeoutMillis:timeoutMillis;
+        if (System.nanoTime() - lastLifesign > timeout*1000*1000) {
           restartTask();
         }
       }

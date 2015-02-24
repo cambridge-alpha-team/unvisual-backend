@@ -258,4 +258,43 @@ public class WatchDogTest {
       }
     }
   }
+
+  @Test
+  public void testStartupTimer() {
+    CountStartupsCreator countStartupsCreator = new CountStartupsCreator();
+
+    IWatchDog<WatchableTest> watchDog = new WatchDog<WatchableTest>(countStartupsCreator);
+
+    IWatchable test = watchDog.getObject();
+    Assert.assertNotNull(test);
+    watchDog.setTimeout(50*1000);
+    watchDog.setStartupTimeout(5);
+
+    Thread watchDogThread = new Thread(watchDog);
+    watchDogThread.start();
+
+    long endTime = System.nanoTime()+10*1000*1000;
+    while (System.nanoTime() < endTime) {
+      try {
+        Thread.sleep(10);
+      } catch(InterruptedException e) {
+        /* Do nothing. */
+      }
+    }
+
+    Assert.assertEquals(1, countStartupsCreator.getStartupCount());
+
+    watchDog.shutDown();
+  }
+
+  private static class CountStartupsCreator implements ICreator<WatchableTest> {
+      private int startupCount = 0;
+      public int getStartupCount() { return startupCount; }
+
+      @Override
+      public WatchableTest create() {
+        startupCount++;
+        return new WatchableTest();
+      }
+    }
 }

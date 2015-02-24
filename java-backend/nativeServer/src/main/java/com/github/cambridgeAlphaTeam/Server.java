@@ -70,6 +70,7 @@ public class Server {
                             }
                         }
                     });
+        watchDog.setStartupTimeout(60*1000);
         watchDog.setTimeout(2000);
         Thread watchDogThread = new Thread(watchDog);
         watchDogThread.start();
