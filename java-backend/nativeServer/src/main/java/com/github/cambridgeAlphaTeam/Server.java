@@ -71,7 +71,7 @@ public class Server {
                         }
                     });
         watchDog.setStartupTimeout(60*1000);
-        watchDog.setTimeout(2000);
+        watchDog.setTimeout(6*1000);
         Thread watchDogThread = new Thread(watchDog);
         watchDogThread.start();
 
