@@ -8,8 +8,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.LinkedHashSet;
 import java.util.Arrays;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -33,6 +35,9 @@ public class ExecCubeletsConnection implements
 
   private static ObjectMapper mapper = new ObjectMapper();
   Process cubeletsProcess;
+
+  /* Needs to be LinkedHashSet as that preserves insertion order. */
+  private LinkedHashSet<Integer> knownCubelets = new LinkedHashSet<Integer>();
 
   private static final Logger logger =
     LoggerFactory.getLogger(ExecCubeletsConnection.class);
@@ -128,8 +133,24 @@ public class ExecCubeletsConnection implements
 
     SortedSet<Integer> keys = new TreeSet<Integer>(cubeletsMap.keySet());
 
+    /* Insert non-null keys into insertion-order-preserving set. */
     int i = 0;
     for (Integer key : keys) {
+      if (i < 6) {
+        Integer value = cubeletsMap.get(key);
+        if (value != null) {
+          knownCubelets.add(key);
+        }
+        i++;
+      } else {
+        break;
+      }
+    }
+
+    /* Actually update cubeletValues. */
+    i = 0;
+    for (Integer key : knownCubelets)
+    {
       if (i < 6) {
         Integer value = cubeletsMap.get(key);
         if (value != null) {
