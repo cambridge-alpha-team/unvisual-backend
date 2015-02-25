@@ -4,3 +4,6 @@
 [submodule "java-backend/tomcatServerBackend/src/main/webapp"]
 	path = java-backend/tomcatServerBackend/src/main/webapp
 	url = git@github.com:cambridge-alpha-team/unvisual-frontend.git
+[submodule "java-backend/nativeServer/src/main/resources/unvisual-frontend"]
+	path = java-backend/nativeServer/src/main/resources/unvisual-frontend
+	url = git@github.com:cambridge-alpha-team/unvisual-frontend.git

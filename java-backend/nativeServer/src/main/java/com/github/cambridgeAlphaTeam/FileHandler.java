@@ -58,7 +58,6 @@ public class FileHandler implements HttpHandler {
     File requestedFile = new File(cwd + reqPath);
 
 
-    /* 404 */
     if (requestedFile.exists()) {
       if (requestedFile.isFile()) {
         try {
