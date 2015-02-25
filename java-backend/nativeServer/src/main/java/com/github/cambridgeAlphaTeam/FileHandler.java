@@ -6,6 +6,9 @@ import java.io.InputStream;
 import java.io.File;
 import java.io.FileInputStream;
 
+import java.util.Map;
+import java.util.HashMap;
+
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -24,6 +27,14 @@ public class FileHandler implements HttpHandler {
   private final File notFoundFile;
   /* Buffer size when reading in files */
   private static final int bufferSize = 10*1024;
+
+  static final Map<String, String> contentTypes;
+  static {
+    contentTypes = new HashMap<>();
+    contentTypes.put(".css", "text/css");
+    contentTypes.put(".html", "text/html");
+    contentTypes.put(".js", "text/javascript");
+  }
 
   public FileHandler() {
     servePath = ".";
@@ -46,9 +57,17 @@ public class FileHandler implements HttpHandler {
     String reqPath = t.getRequestURI().getPath();
     File requestedFile = new File(cwd + reqPath);
 
+
     /* 404 */
     if (requestedFile.exists()) {
       if (requestedFile.isFile()) {
+        try {
+          String extension = reqPath.substring(reqPath.lastIndexOf("."));
+          t.getResponseHeaders().add("Content-Type", contentTypes.get(extension));
+        } catch (IndexOutOfBoundsException e) {
+          t.getResponseHeaders().add("Content-Type", "application/octet-stream");
+        }
+
         t.sendResponseHeaders(200, requestedFile.length());
         OutputStream os = t.getResponseBody();
         writeFile(requestedFile, os);
