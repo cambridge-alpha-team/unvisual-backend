@@ -120,8 +120,8 @@ public class Server {
             super(cmdarray, knownCubelets);
             this.sender = sender;
             /* Fill in Sonic Pi with something */
-            logger.info("Feeding zero cubelet values to Sonic Pi");
-            // messageHandle(new int[]{0, 0, 0, 0, 0, 0});
+            logger.debug("Feeding zero cubelet values to Sonic Pi");
+            messageHandle(new int[]{0, 0, 0, 0, 0, 0});
         }
 
         public void messageHandle(int[] cubeletValues) {
@@ -147,7 +147,7 @@ public class Server {
             formatter.format("  return min + scaled - roundoff%n");
             formatter.format("end%n");
 
-            logger.info(strb.toString());
+            logger.debug(strb.toString());
 
             try {
                 sender.sendCode(strb.toString());
