@@ -63,7 +63,11 @@ public class FileHandler implements HttpHandler {
       if (requestedFile.isFile()) {
         try {
           String extension = reqPath.substring(reqPath.lastIndexOf("."));
-          t.getResponseHeaders().add("Content-Type", contentTypes.get(extension));
+          if (null != contentTypes.get(extension)) {
+            t.getResponseHeaders().add("Content-Type", contentTypes.get(extension));
+          } else {
+            t.getResponseHeaders().add("Content-Type", "application/octet-stream");
+          }
         } catch (IndexOutOfBoundsException e) {
           t.getResponseHeaders().add("Content-Type", "application/octet-stream");
         }
@@ -90,7 +94,11 @@ public class FileHandler implements HttpHandler {
     if (null != notFoundFile && notFoundFile.exists()) {
       try {
         String extension = notFoundFile.getPath().substring(reqPath.lastIndexOf("."));
-        t.getResponseHeaders().add("Content-Type", contentTypes.get(extension));
+        if (null != contentTypes.get(extension)) {
+          t.getResponseHeaders().add("Content-Type", contentTypes.get(extension));
+        } else {
+          t.getResponseHeaders().add("Content-Type", "application/octet-stream");
+        }
       } catch (IndexOutOfBoundsException e) {
         t.getResponseHeaders().add("Content-Type", "application/octet-stream");
       }
