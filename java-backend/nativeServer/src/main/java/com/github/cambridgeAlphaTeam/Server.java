@@ -26,7 +26,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * This class serves frontend and also responds to its queries.
  * @author Isaac Dunn &lt;ird28@cam.ac.uk&gt;
+ * @author Kovacsics Robert &lt;rmk35@cam.ac.uk&gt;
  */
 public class Server {
 
@@ -34,14 +36,6 @@ public class Server {
     private static final Logger logger = LoggerFactory.getLogger(Server.class);
 
     public static void main(String[] args) throws IOException, OscException {
-        if (args.length < 1) {
-            System.err.println("Usage:\njava -jar \"this jar file\" " +
-                "\"location of frontend\" " +
-                "[\"program returning cubelet values\"] " +
-                "[optional arguments for said program]");
-            return;
-        }
-
         sender = new OscSender();
         HttpServer server = HttpServer.create(new InetSocketAddress(8000), 0);
 
@@ -50,11 +44,16 @@ public class Server {
         server.createContext("/osc/run", new LoggerHandler(new RunCodeHandler()));
         server.createContext("/osc/stop", new LoggerHandler(new StopMusicHandler()));
 
-        /* File context */
-        server.createContext("/", new LoggerHandler(new FileHandler(args[0]))); // serves front end
-        server.setExecutor(null); // creates a default executor
-        server.start();
+        if (args.length < 1) {
+            /* Jar handler context, don't add trailing slash! */
+            server.createContext("/", new LoggerHandler
+                (new JarHandler("unvisual-frontend"))); // serves front end
+        } else if (args.length >= 1) {
+            /* File context */
+            server.createContext("/", new LoggerHandler(new FileHandler(args[0]))); // serves front end
+        }
 
+        server.start();
         logger.info("Server started");
 
         if (args.length >= 2) {
@@ -79,7 +78,7 @@ public class Server {
             watchDogThread.start();
         } else {
            logger.warn("No cubelet program provided: cubelet functionality not being used");
-        } 
+        }
     }
 
     static class RunCodeHandler implements HttpHandler {
