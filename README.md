@@ -4,15 +4,15 @@ Java &amp; node.js backend.
 ## Getting the server running
 
 1. Install [Maven](http://maven.apache.org/download.cgi) if you don't already have it (try `mvn -v` to find out).
-2. Clone this repository and unvisual-frontend, if you haven't already.
+2. Clone this repository, making sure to initialise the frontend submodule, either by using the `--recursive` flag when cloning, or running `git submodule update --init --recursive` after cloning.
 3. Change directory to `{unvisual-backend}/java-backend/oscSender` and run `mvn install`.
 4. Change directory to `{unvisual-backend}/java-backend/nodeCubeletsConnect` and run `mvn install`.
 5. Change directory to `{unvisual-backend}/java-backend/nativeServer`.
-6. Run `mvn package` then you can run the `*-jar-with-dependencies.jar` file under `target/`, with the argument of `{unvisual-frontend}` and the program reading in the cubelets values.
+6. Run `mvn package` then you can run the `*-jar-with-dependencies.jar` file under `target/`.
+  * If you want to serve the a different front end to the one packaged in the jar, then pass the location of this front end as the first argument.
+  * If you want to use the cubelets, you have to (at the moment) give a location for a front end to serve and then the program reading in the cubelets values.
 7. Make sure that you have started Sonic Pi (i.e. you have the Sonic Pi app running, for now).
-8. Go to [localhost:8000/index.html](http://localhost:8000/index.html) to use the project.
-
-This definitely works for Linux and Windows, and there is no reason that it shouldn't for Macs.
+8. Go to [localhost:8000](http://localhost:8000) to use the project.
 
 
 ## Getting Cubelets to work
