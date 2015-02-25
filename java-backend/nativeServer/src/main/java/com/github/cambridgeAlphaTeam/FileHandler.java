@@ -74,6 +74,7 @@ public class FileHandler implements HttpHandler {
         t.close();
         return;
       } else if (requestedFile.isDirectory()) {
+        t.getResponseHeaders().add("Content-Type", contentTypes.get(".html"));
         File greeter = new File(requestedFile, "index.html");
         if (greeter.isFile()) {
           t.sendResponseHeaders(200, greeter.length());
@@ -87,11 +88,19 @@ public class FileHandler implements HttpHandler {
 
     /* If we had no errors, we should not get this far. */
     if (null != notFoundFile && notFoundFile.exists()) {
+      try {
+        String extension = notFoundFile.getPath().substring(reqPath.lastIndexOf("."));
+        t.getResponseHeaders().add("Content-Type", contentTypes.get(extension));
+      } catch (IndexOutOfBoundsException e) {
+        t.getResponseHeaders().add("Content-Type", "application/octet-stream");
+      }
+
       t.sendResponseHeaders(404, notFoundFile.length());
       OutputStream os = t.getResponseBody();
       writeFile(notFoundFile, os);
       t.close();
     } else {
+      t.getResponseHeaders().add("Content-Type", "text/plain");
       byte[] response = "Error 404: File not found".getBytes();
       t.sendResponseHeaders(404, response.length);
       OutputStream os = t.getResponseBody();
