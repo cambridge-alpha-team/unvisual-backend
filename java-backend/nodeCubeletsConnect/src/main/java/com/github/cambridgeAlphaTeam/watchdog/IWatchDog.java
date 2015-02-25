@@ -8,6 +8,7 @@ package com.github.cambridgeAlphaTeam.watchdog;
 public interface IWatchDog<T extends IWatchable> extends Runnable,
   IWatcher {
   public T getObject();
+  public void setStartupTimeout(long startupTimeoutMillis);
   public void setTimeout(long timeoutMillis);
   public void shutDown();
 }

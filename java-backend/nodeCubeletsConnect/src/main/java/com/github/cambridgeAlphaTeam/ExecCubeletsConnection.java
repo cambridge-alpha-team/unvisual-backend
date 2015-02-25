@@ -8,8 +8,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.LinkedHashSet;
 import java.util.Arrays;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -34,15 +36,20 @@ public class ExecCubeletsConnection implements
   private static ObjectMapper mapper = new ObjectMapper();
   Process cubeletsProcess;
 
+  /* Needs to be LinkedHashSet as that preserves insertion order. */
+  private SaveKnownCubelets knownCubelets;
+
   private static final Logger logger =
     LoggerFactory.getLogger(ExecCubeletsConnection.class);
 
-  public ExecCubeletsConnection(final String[] cmdarray) throws
+  public ExecCubeletsConnection(final String[] cmdarray, SaveKnownCubelets saveKnownCubelets) throws
     IOException {
     /* One for each face of the Bluetooth cube */
     cubeletValues = new int[6];
 
     cubeletsProcess = Runtime.getRuntime().exec(cmdarray);
+
+    knownCubelets = saveKnownCubelets;
   }
 
   @Override
@@ -71,7 +78,7 @@ public class ExecCubeletsConnection implements
           }
         }
       };
-      logSTDERR.run();
+      logSTDERR.start();
 
       while (!stop) {
         String line;
@@ -128,8 +135,24 @@ public class ExecCubeletsConnection implements
 
     SortedSet<Integer> keys = new TreeSet<Integer>(cubeletsMap.keySet());
 
+    /* Insert non-null keys into insertion-order-preserving set. */
     int i = 0;
     for (Integer key : keys) {
+      if (i < 6) {
+        Integer value = cubeletsMap.get(key);
+        if (value != null) {
+          knownCubelets.getKnownCubelets().add(key);
+        }
+        i++;
+      } else {
+        break;
+      }
+    }
+
+    /* Actually update cubeletValues. */
+    i = 0;
+    for (Integer key : knownCubelets.getKnownCubelets())
+    {
       if (i < 6) {
         Integer value = cubeletsMap.get(key);
         if (value != null) {
@@ -148,5 +171,11 @@ public class ExecCubeletsConnection implements
     /* In case subclassing, you can override this. It is called when
      * cubelet values change.
      */
+  }
+
+  public static class SaveKnownCubelets {
+    private LinkedHashSet<Integer> savedKnownCubelets = new LinkedHashSet<Integer>();
+    synchronized LinkedHashSet<Integer> getKnownCubelets() { return savedKnownCubelets; }
+    synchronized void setKnownCubelets(LinkedHashSet<Integer> knownCubelets) { savedKnownCubelets = knownCubelets; }
   }
 }

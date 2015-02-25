@@ -23,13 +23,14 @@ public class Main {
       //ICubeletsConnection conn = new ServerCubeletsConnection(
       //  Integer.parseInt(args[0]));
 
+      final ExecCubeletsConnection.SaveKnownCubelets knownCubelets = new ExecCubeletsConnection.SaveKnownCubelets();
       IWatchDog<IWatchableCubeletsConnection> watchDog =
         new WatchDog<IWatchableCubeletsConnection>(
       new ICreator<IWatchableCubeletsConnection>() {
         @Override
         public ExecCubeletsConnection create() {
           try {
-            return new ExecCubeletsConnection(args);
+            return new ExecCubeletsConnection(args, knownCubelets);
           } catch (IOException e) {
             logger.error("Unable to open process!", e);
             return null;
