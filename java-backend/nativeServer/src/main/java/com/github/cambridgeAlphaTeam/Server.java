@@ -96,6 +96,7 @@ public class Server {
                 throw new IOException("Sending code to Sonic Pi server failed", e);
             }
             t.sendResponseHeaders(200, 0);
+            t.close();
         }
     }
 
@@ -109,6 +110,7 @@ public class Server {
                 throw new IOException("Sending message to Sonic Pi server failed", e);
             }
             t.sendResponseHeaders(200, 0);
+            t.close();
         }
     }
 
