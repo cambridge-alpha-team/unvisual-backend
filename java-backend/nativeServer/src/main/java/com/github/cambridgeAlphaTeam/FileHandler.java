@@ -52,66 +52,65 @@ public class FileHandler implements HttpHandler {
   }
 
   public void handle(HttpExchange t) throws IOException {
-    String cwd = new File(servePath).getCanonicalPath();
-    /* Always absolute, that is starts with "/" */
-    String reqPath = t.getRequestURI().getPath();
-    File requestedFile = new File(cwd + reqPath);
+    try {
+      String cwd = new File(servePath).getCanonicalPath();
+      /* Always absolute, that is starts with "/" */
+      String reqPath = t.getRequestURI().getPath();
+      File requestedFile = new File(cwd + reqPath);
 
 
-    if (requestedFile.exists()) {
-      if (requestedFile.isFile()) {
-        try {
-          String extension = reqPath.substring(reqPath.lastIndexOf("."));
-          if (null != contentTypes.get(extension)) {
-            t.getResponseHeaders().add("Content-Type", contentTypes.get(extension));
-          } else {
+      if (requestedFile.exists()) {
+        if (requestedFile.isFile()) {
+          try {
+            String extension = reqPath.substring(reqPath.lastIndexOf("."));
+            if (null != contentTypes.get(extension)) {
+              t.getResponseHeaders().add("Content-Type", contentTypes.get(extension));
+            } else {
+              t.getResponseHeaders().add("Content-Type", "application/octet-stream");
+            }
+          } catch (IndexOutOfBoundsException e) {
             t.getResponseHeaders().add("Content-Type", "application/octet-stream");
           }
-        } catch (IndexOutOfBoundsException e) {
-          t.getResponseHeaders().add("Content-Type", "application/octet-stream");
-        }
 
-        t.sendResponseHeaders(200, requestedFile.length());
-        OutputStream os = t.getResponseBody();
-        writeFile(requestedFile, os);
-        t.close();
-        return;
-      } else if (requestedFile.isDirectory()) {
-        t.getResponseHeaders().add("Content-Type", contentTypes.get(".html"));
-        File greeter = new File(requestedFile, "index.html");
-        if (greeter.isFile()) {
-          t.sendResponseHeaders(200, greeter.length());
+          t.sendResponseHeaders(200, requestedFile.length());
           OutputStream os = t.getResponseBody();
-          writeFile(greeter, os);
-          t.close();
-          return;
+          writeFile(requestedFile, os);
+        } else if (requestedFile.isDirectory()) {
+          t.getResponseHeaders().add("Content-Type", contentTypes.get(".html"));
+          File greeter = new File(requestedFile, "index.html");
+          if (greeter.isFile()) {
+            t.sendResponseHeaders(200, greeter.length());
+            OutputStream os = t.getResponseBody();
+            writeFile(greeter, os);
+          }
         }
-      }
-    }
+      } else {
 
-    /* If we had no errors, we should not get this far. */
-    if (null != notFoundFile && notFoundFile.exists()) {
-      try {
-        String extension = notFoundFile.getPath().substring(reqPath.lastIndexOf("."));
-        if (null != contentTypes.get(extension)) {
-          t.getResponseHeaders().add("Content-Type", contentTypes.get(extension));
+        /* If we had no errors, we should not get this far. */
+        if (null != notFoundFile && notFoundFile.exists()) {
+          try {
+            String extension = notFoundFile.getPath().substring(reqPath.lastIndexOf("."));
+            if (null != contentTypes.get(extension)) {
+              t.getResponseHeaders().add("Content-Type", contentTypes.get(extension));
+            } else {
+              t.getResponseHeaders().add("Content-Type", "application/octet-stream");
+            }
+          } catch (IndexOutOfBoundsException e) {
+            t.getResponseHeaders().add("Content-Type", "application/octet-stream");
+          }
+
+          t.sendResponseHeaders(404, notFoundFile.length());
+          OutputStream os = t.getResponseBody();
+          writeFile(notFoundFile, os);
         } else {
-          t.getResponseHeaders().add("Content-Type", "application/octet-stream");
+          t.getResponseHeaders().add("Content-Type", "text/plain");
+          byte[] response = "Error 404: File not found".getBytes();
+          t.sendResponseHeaders(404, response.length);
+          OutputStream os = t.getResponseBody();
+          os.write(response);
         }
-      } catch (IndexOutOfBoundsException e) {
-        t.getResponseHeaders().add("Content-Type", "application/octet-stream");
       }
-
-      t.sendResponseHeaders(404, notFoundFile.length());
-      OutputStream os = t.getResponseBody();
-      writeFile(notFoundFile, os);
-      t.close();
-    } else {
-      t.getResponseHeaders().add("Content-Type", "text/plain");
-      byte[] response = "Error 404: File not found".getBytes();
-      t.sendResponseHeaders(404, response.length);
-      OutputStream os = t.getResponseBody();
-      os.write(response);
+    } finally {
       t.close();
     }
   }
