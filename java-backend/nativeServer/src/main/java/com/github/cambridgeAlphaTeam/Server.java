@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 
 import java.net.InetSocketAddress;
 
@@ -25,6 +26,12 @@ import com.sun.net.httpserver.HttpServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.GnuParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.ParseException;
 /**
  * This class serves frontend and also responds to its queries.
  * @author Isaac Dunn &lt;ird28@cam.ac.uk&gt;
@@ -34,8 +41,56 @@ public class Server {
 
     private static OscSender sender;
     private static final Logger logger = LoggerFactory.getLogger(Server.class);
+    /* Command line options parser */
+    private static final Options options = new Options();
+    static {
+        /* addOption(String short option,
+         *           String long option,
+         *           boolean has arguments,
+         *           String description)
+         *
+         * where a short option is like "-h" and a long option is like
+         * "--help" (which takes no arguments). The description is for
+         * generating the help message.
+         */
+        options.addOption ("h", "help", false, "Print this help message");
+        options.addOption ("u", "usage", false, "Print the list of options");
+        options.addOption ("c", "cubelets-program", true, "A single string of the cubelet program. " +
+                "If you want to pass arguments to it, make a batch/shell file and put the arguments to that file, " +
+                "and pass that batch/shell file here.");
+        options.addOption ("f", "frontend", true, "The location of the frond-end files. " +
+                "These are normally found in the Jar under \"unvisula-frontend/\" " +
+                "but for development it is easier to not have to repack jar (a backend task) " +
+                "everytime the frontend changes.");
+    }
 
     public static void main(String[] args) throws IOException, OscException {
+        /* Parsing command line, may terminate program. {{{ */
+        /* The parser for the options. */
+        CommandLineParser parser = new GnuParser();
+
+        CommandLine parsedCommanLine;
+        try {
+            parsedCommanLine = parser.parse(options, args);
+        } catch (ParseException e) {
+            System.err.println("Unable to parse command line options!");
+            System.err.println(e.getMessage());
+            System.err.println("Help:");
+            printHelp(System.err);
+            return;
+        }
+
+        if (parsedCommanLine.hasOption('h')) {
+            printHelp(System.out);
+            return;
+        }
+
+        if (parsedCommanLine.hasOption('u')) {
+            printUsage();
+            return;
+        }
+        /* }}} */
+
         sender = new OscSender();
         HttpServer server = HttpServer.create(new InetSocketAddress(8000), 0);
 
@@ -44,20 +99,21 @@ public class Server {
         server.createContext("/osc/run", new LoggerHandler(new RunCodeHandler()));
         server.createContext("/osc/stop", new LoggerHandler(new StopMusicHandler()));
 
-        if (args.length < 1) {
+        if (parsedCommanLine.hasOption("f")) {
+            /* File context */
+            server.createContext("/", new LoggerHandler(new FileHandler
+                        (parsedCommanLine.getOptionValue("f")))); // serves front end
+        } else {
             /* Jar handler context, don't add trailing slash! */
             server.createContext("/", new LoggerHandler
                 (new JarHandler("unvisual-frontend"))); // serves front end
-        } else if (args.length >= 1) {
-            /* File context */
-            server.createContext("/", new LoggerHandler(new FileHandler(args[0]))); // serves front end
         }
 
         server.start();
         logger.info("Server started");
 
-        if (args.length >= 2) {
-            final String[] cubeletsProcessCmd = Arrays.copyOfRange(args, 1, args.length);
+        if (parsedCommanLine.hasOption("c")) {
+            final String[] cubeletsProcessCmd = parsedCommanLine.getOptionValues("c");
             /* Cubelets connection */
             final ExecCubeletsConnection.SaveKnownCubelets knownCubelets = new ExecCubeletsConnection.SaveKnownCubelets();
             IWatchDog<IWatchableCubeletsConnection> watchDog =
@@ -156,5 +212,28 @@ public class Server {
                 logger.error("Unhandler OscException in trying to send cubelet values", e);
             }
         }
+    }
+
+    public static void printUsage() {
+        final PrintWriter stdout = new PrintWriter(System.out);
+        new HelpFormatter().printUsage(stdout, 72, "java -jar unvisual.jar", options);
+        stdout.close();
+    }
+
+    public static void printHelp(OutputStream outs) {
+        final PrintWriter outw = new PrintWriter(outs);
+        /* printHelp(int width, String cmdLineSyntax, String header, Options options, String footer) */
+        /* public void printHelp(PrintWriter pw,
+         *                       int width,
+         *                       String cmdLineSyntax,
+         *                       String header,
+         *                       Options options,
+         *                       int leftPad,
+         *                       int descPad,
+         *                       String footer)
+         */
+        new HelpFormatter().printHelp(outw, 72, "java -jar unvisual.jar",
+                "", options, 2, 4, "");
+        outw.close();
     }
 }
