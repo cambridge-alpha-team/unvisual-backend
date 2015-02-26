@@ -282,7 +282,8 @@ public class WatchDogTest {
       }
     }
 
-    Assert.assertEquals(1, countStartupsCreator.getStartupCount());
+    /* Starting up timer reset after process death. */
+    Assert.assertEquals(2, countStartupsCreator.getStartupCount());
 
     watchDog.shutDown();
   }
