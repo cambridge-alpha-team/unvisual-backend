@@ -55,9 +55,9 @@ public class Server {
          */
         options.addOption ("h", "help", false, "Print this help message");
         options.addOption ("u", "usage", false, "Print the list of options");
-        options.addOption ("c", "cubelets-program", true, "A single string of the cubelet program. " +
-                "If you want to pass arguments to it, make a batch/shell file and put the arguments to that file, " +
-                "and pass that batch/shell file here.");
+        options.addOption ("c", "cubelets-program", true, "Cubelets program, " +
+                "further uses of \"-c\" will act as arguments to the "+
+                "cubelets program.");
         options.addOption ("f", "frontend", true, "The location of the frond-end files. " +
                 "These are normally found in the Jar under \"unvisula-frontend/\" " +
                 "but for development it is easier to not have to repack jar (a backend task) " +
