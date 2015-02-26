@@ -25,9 +25,11 @@ public class WatchDog<T extends IWatchable> implements IWatchDog<T> {
 
   public synchronized void notifyStillAlive(IWatchable who) {
     /* Only take messages from current task. */
-    startingUp = false;
     if (taskObject == who) {
+      startingUp = false;
       lastLifesign = System.nanoTime();
+      /* Wake up in case we are in startupTimeoutMillis sleep. */
+      notify();
     }
   }
 
