@@ -1,6 +1,8 @@
 # unvisual-backend
 Java &amp; node.js backend.
 
+Pulls in [unvisual-frontend](https://github.com/cambridge-alpha-team/unvisual-frontend) as a submodule. (Hopefully.)
+
 ## Getting the server running
 
 1. Install [Maven](http://maven.apache.org/download.cgi) if you don't already have it (try `mvn -v` to find out).
