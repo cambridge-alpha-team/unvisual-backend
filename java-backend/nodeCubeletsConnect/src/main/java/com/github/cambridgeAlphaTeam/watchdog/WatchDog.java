@@ -25,9 +25,11 @@ public class WatchDog<T extends IWatchable> implements IWatchDog<T> {
 
   public synchronized void notifyStillAlive(IWatchable who) {
     /* Only take messages from current task. */
-    startingUp = false;
     if (taskObject == who) {
+      startingUp = false;
       lastLifesign = System.nanoTime();
+      /* Wake up in case we are in startupTimeoutMillis sleep. */
+      notify();
     }
   }
 
@@ -60,6 +62,7 @@ public class WatchDog<T extends IWatchable> implements IWatchDog<T> {
   public synchronized void stopTask() {
     logger.debug("Stopping task: " + taskObject);
     taskObject.cleanup();
+    startingUp = true;
   }
 
   public synchronized void restartTask() {
@@ -83,27 +86,27 @@ public class WatchDog<T extends IWatchable> implements IWatchDog<T> {
   public void run() {
     lastLifesign = System.nanoTime();
     while (!shutDown) {
+      long timeout;
+      if (startingUp)
+      {
+        logger.debug("Using startupTimeoutMillis of " + startupTimeoutMillis);
+        timeout = startupTimeoutMillis;
+      }
+      else
+      {
+        logger.debug("Using timeoutMillis of " + timeoutMillis);
+        timeout = timeoutMillis;
+      }
       /* Acquire lock and go to sleep. */
       synchronized (this) {
         try {
-          wait (timeoutMillis);
+          wait (timeout);
         } catch (InterruptedException e) {
           logger.error("Unexpected interrupt!", e);
         }
 
         /* Check timeout, if elapsed restart task.  Milliseconds are
          * converted to nanoseconds. */
-        long timeout;
-        if (startingUp)
-        {
-          logger.debug("Using startupTimeoutMillis of " + startupTimeoutMillis);
-          timeout = startupTimeoutMillis;
-        }
-        else
-        {
-          logger.debug("Using timeoutMillis of " + timeoutMillis);
-          timeout = timeoutMillis;
-        }
         if (System.nanoTime() - lastLifesign > timeout*1000*1000) {
           logger.debug("Restarting due to timeout expiration.");
           restartTask();

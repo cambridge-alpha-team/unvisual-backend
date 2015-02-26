@@ -129,7 +129,8 @@ public class Server {
                                 }
                             }
                         });
-                watchDog.setTimeout(2000);
+            watchDog.setStartupTimeout(60*1000);		
+            watchDog.setTimeout(5*1000);		
             Thread watchDogThread = new Thread(watchDog);
             watchDogThread.start();
         } else {
