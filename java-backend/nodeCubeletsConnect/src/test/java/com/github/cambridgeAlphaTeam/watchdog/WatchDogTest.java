@@ -239,12 +239,16 @@ public class WatchDogTest {
     Thread watchDogThread = new Thread(watchDog);
     watchDogThread.start();
 
-    long endTime = System.nanoTime()+10*1000*1000;
-    while (System.nanoTime() < endTime) {
-      try {
-        Thread.sleep(10);
-      } catch(InterruptedException e) {
-        /* Do nothing. */
+    /* If we did not get cleaned up at all, we have not tested anything!
+     */
+    while (test.getCleanups() < 1) {
+      long endTime = System.nanoTime()+10*1000*1000;
+      while (System.nanoTime() < endTime) {
+        try {
+          Thread.sleep(10);
+        } catch(InterruptedException e) {
+          /* Do nothing. */
+        }
       }
     }
 
