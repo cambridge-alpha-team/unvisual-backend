@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 public class WatchDogTest {
   private static final Logger logger =
     LoggerFactory.getLogger(WatchDogTest.class);
+  private static final int scalingFactor = 1;
 
   /**
    * Test to see if watchdog calls cleanup on after the timeout expires.
@@ -30,14 +31,14 @@ public class WatchDogTest {
     });
     WatchableTest test = watchDog.getObject();
     Assert.assertNotNull(test);
-    watchDog.setTimeout(5);
+    watchDog.setTimeout(5*scalingFactor);
 
     Thread watchDogThread = new Thread(watchDog);
     watchDogThread.start();
 
     for (int i = 0; i < 5 && !test.getCleanedUp(); i++) {
       try {
-        Thread.sleep(10);
+        Thread.sleep(10*scalingFactor);
       } catch (InterruptedException e) {
         /* Do nothing. */
       }
@@ -100,17 +101,17 @@ public class WatchDogTest {
 
     DyingTest test1 = watchDog.getObject();
     Assert.assertNotNull(test1);
-    watchDog.setTimeout(10);
+    watchDog.setTimeout(10*scalingFactor);
 
     Thread watchDogThread = new Thread(watchDog);
     watchDogThread.start();
 
     /* Shorter than timeout so that we know cleanup was called because
      * of notifyDying. */
-    long endTime = System.nanoTime()+5*1000*1000;
+    long endTime = System.nanoTime()+5*scalingFactor*1000*1000;
     while (System.nanoTime() < endTime) {
       try {
-        Thread.sleep(100);
+        Thread.sleep(5*scalingFactor);
       } catch(InterruptedException e) {
         /* Do nothing. */
       }
@@ -163,15 +164,15 @@ public class WatchDogTest {
 
     DontRestartTest test1 = watchDog.getObject();
     Assert.assertNotNull(test1);
-    watchDog.setTimeout(10);
+    watchDog.setTimeout(10*scalingFactor);
 
     Thread watchDogThread = new Thread(watchDog);
     watchDogThread.start();
 
-    long endTime = System.nanoTime()+50*1000*1000;
+    long endTime = System.nanoTime()+50*scalingFactor*1000*1000;
     while (System.nanoTime() < endTime) {
       try {
-        Thread.sleep(50);
+        Thread.sleep(50*scalingFactor);
       } catch(InterruptedException e) {
         /* Do nothing. */
       }
@@ -207,7 +208,7 @@ public class WatchDogTest {
     public synchronized void run() {
       while (!stop) {
         try {
-          wait(5);
+          wait(5*scalingFactor);
         } catch (InterruptedException e) {
           /* Do nothing. */
         }
@@ -234,7 +235,7 @@ public class WatchDogTest {
 
     DontDoubleRestartTest test = watchDog.getObject();
     Assert.assertNotNull(test);
-    watchDog.setTimeout(5);
+    watchDog.setTimeout(5*scalingFactor);
 
     Thread watchDogThread = new Thread(watchDog);
     watchDogThread.start();
@@ -242,10 +243,10 @@ public class WatchDogTest {
     /* If we did not get cleaned up at all, we have not tested anything!
      */
     while (test.getCleanups() < 1) {
-      long endTime = System.nanoTime()+10*1000*1000;
+      long endTime = System.nanoTime()+10*scalingFactor*1000*1000;
       while (System.nanoTime() < endTime) {
         try {
-          Thread.sleep(10);
+          Thread.sleep(10*scalingFactor);
         } catch(InterruptedException e) {
           /* Do nothing. */
         }
@@ -285,7 +286,7 @@ public class WatchDogTest {
       try {
         while (cleanups == 0) {
           try {
-            wait(1*1000); /* One second */
+            wait(1*scalingFactor*1000); /* One second */
           } catch (InterruptedException e) {
             /* Do nothing. */
           }
@@ -308,24 +309,23 @@ public class WatchDogTest {
 
     IWatchable test = watchDog.getObject();
     Assert.assertNotNull(test);
-    watchDog.setTimeout(1*1000);
-    watchDog.setStartupTimeout(10);
+    watchDog.setTimeout(1*scalingFactor*1000);
+    watchDog.setStartupTimeout(10*scalingFactor);
 
     Thread watchDogThread = new Thread(watchDog);
     watchDogThread.start();
 
-    long endTime = System.nanoTime()+10*1000*1000;
+    long endTime = System.nanoTime()+25*scalingFactor*1000*1000;
     while (System.nanoTime() < endTime) {
       try {
-        Thread.sleep(25); /* 12ms to give a small margin. By 10ms, *
-                           * should have restarted test twice.     */
+        Thread.sleep(25*scalingFactor);
       } catch(InterruptedException e) {
         /* Do nothing. */
       }
     }
 
     /* Starting up timer reset after process death. */
-    Assert.assertEquals(2, countStartupsCreator.getStartupCount());
+    Assert.assertTrue(1 < countStartupsCreator.getStartupCount());
 
     watchDog.shutDown();
   }
@@ -364,17 +364,17 @@ public class WatchDogTest {
     DontRestartTest test1 = watchDog.getObject();
     Assert.assertNotNull(test1);
     /* If timer never switches, we would never call cleanup(). */
-    watchDog.setStartupTimeout(50);
+    watchDog.setStartupTimeout(50*scalingFactor);
     /* DontRestartTest uses 5ms. */
-    watchDog.setTimeout(1);
+    watchDog.setTimeout(1*scalingFactor);
 
     Thread watchDogThread = new Thread(watchDog);
     watchDogThread.start();
 
-    long endTime = System.nanoTime()+10*1000*1000;
+    long endTime = System.nanoTime()+10*scalingFactor*1000*1000;
     while (System.nanoTime() < endTime) {
       try {
-        Thread.sleep(10);
+        Thread.sleep(10*scalingFactor);
       } catch(InterruptedException e) {
         /* Do nothing. */
       }
