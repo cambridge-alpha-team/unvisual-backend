@@ -1,7 +1,10 @@
 # unvisual-backend
 Java &amp; node.js backend.
 
-Pulls in [unvisual-frontend](https://github.com/cambridge-alpha-team/unvisual-frontend) as a submodule. (Hopefully.)
+Pulls in [unvisual-frontend](https://github.com/cambridge-alpha-team/unvisual-frontend) as a submodule.
+
+If you just want to use it, you can ignore the heading "Compiling the server" heading. That is in case you want to extend the backend in some way.
+If you are only changing the front-end you can specify a custom location to serve, just use "-f {unvisual-frontend}".
 
 ## Running the server
 
